@@ -13,9 +13,10 @@ import { Devices } from './models/devices.model';
 import { Permissions } from './models/permissions.model';
 import { Queries } from './models/queries.model';
 import { QueryParams } from './models/queryParams.model';
-import { Roles } from './models/roles.model';
+import { Roles } from './domains/roles/roles.model';
 import { Teams } from './models/teams.model';
 import { VerificationCodes } from './models/verificationCodes.model';
+import { RolesModule } from './domains/roles/roles.module';
 
 
 @Module({
@@ -48,6 +49,7 @@ import { VerificationCodes } from './models/verificationCodes.model';
         MongooseModule.forRoot(process.env.MONGO_URI),
         ErrorModule,
         UsersModule,
+        RolesModule,
         AuthModule
     ]
 })

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { createUniqueName } from '../../utils/methods';
 import { defaultPhotoUrl } from '../../constants';
-import { Roles } from '../../models/roles.model';
+import { Roles } from '../roles/roles.model';
 import { Devices } from '../../models/devices.model';
 import { Teams } from '../../models/teams.model';
 import { VerificationCodes } from '../../models/verificationCodes.model';
@@ -28,11 +28,11 @@ export class Users {
     profile_image: string
 
     @OneToOne(() => Roles)
-    @JoinColumn()
+    @JoinColumn({name: 'role_id'})
     role: Roles
 
     @OneToOne(() => Teams)
-    @JoinColumn()
+    @JoinColumn({name: 'team_id'})
     team: Teams
 
     @OneToMany(() => Devices, devices => devices.user)
