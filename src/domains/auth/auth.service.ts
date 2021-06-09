@@ -23,14 +23,14 @@ export class AuthService {
         if(isUserEmailUnique) {
             const cryptResult = await this.bcryptStrategies.encrypt(userTransferDto.password);
 
-            userCreateDto.password = cryptResult.encryptedPassword;
-            userCreateDto.password_salt = cryptResult.salt;
-            userCreateDto.email = userTransferDto.email;
-            userCreateDto.role_id = playerId;
+            userCreateDto.Password = cryptResult.encryptedPassword;
+            userCreateDto.Password_salt = cryptResult.salt;
+            userCreateDto.Email = userTransferDto.email;
+            userCreateDto.Role_id = playerId;
 
             const user = await this.usersService.create(userCreateDto);
-
-            return this.createToken(user.id);
+            const token =  this.createToken(user.id);
+            return { token };
         } else
             throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST)
     }

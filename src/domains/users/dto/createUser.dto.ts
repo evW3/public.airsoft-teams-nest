@@ -1,33 +1,33 @@
 export class CreateUserDto {
-    private Email: string;
-    private Password: string;
-    private Password_salt: string;
-    private Role_id: number;
+    private email: string;
+    private password: string;
+    private password_salt: string;
+    private role_id: number;
 
-    set email(email: string) {
-        this.Email = email;
+    set Email(email: string) {
+        this.email = email;
     }
-    set password(password: string) {
-        this.Password = password;
+    set Password(password: string) {
+        this.password = password;
     }
-    set password_salt(passwordSalt: string) {
-        this.Password_salt = passwordSalt;
+    set Password_salt(passwordSalt: string) {
+        this.password_salt = passwordSalt;
     }
-    set role_id(roleId: number) {
-        this.Role_id = roleId;
+    set Role_id(roleId: number) {
+        this.role_id = roleId;
     }
 
-    get email() {
-        return this.Email;
+    get Email() {
+        return this.email;
     }
-    get password() {
-        return this.Password;
+    get Password() {
+        return this.password;
     }
-    get password_salt() {
-        return this.Password_salt;
+    get Password_salt() {
+        return this.password_salt;
     }
-    get role_id() {
-        return this.Role_id;
+    get Role_id() {
+        return this.role_id;
     }
     constructor() {}
 }
