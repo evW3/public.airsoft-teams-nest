@@ -32,8 +32,8 @@ export class QueryParams16231027655013 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const table = await queryRunner.getTable('query_params');
-        const foreignKeyUser = table.foreignKeys.find(fk => fk.columnNames.indexOf('query_id') !== -1);
-        await queryRunner.dropForeignKey('query_params', foreignKeyUser);
+        const foreignKeyQuery = table.foreignKeys.find(fk => fk.columnNames.indexOf('query_id') !== -1);
+        await queryRunner.dropForeignKey('query_params', foreignKeyQuery);
         await queryRunner.dropColumn('query_params', 'query_id');
         await queryRunner.dropTable('query_params');
     }

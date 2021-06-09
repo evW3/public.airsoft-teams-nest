@@ -12,8 +12,8 @@ import { RolesModule } from '../roles/roles.module';
         UsersModule,
         RolesModule,
         JwtModule.register({
-            secret: '4P=]Mi0+PY54W]HkXbiu',
-            signOptions: { expiresIn: '24h' },
+            secret: process.env.TOKEN_SECRET_KEY,
+            signOptions: { expiresIn: process.env.TOKEN_SECRET_EXPIRES_IN },
         })
     ],
     providers: [AuthService, BcryptStrategies],

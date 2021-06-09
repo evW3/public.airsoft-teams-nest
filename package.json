@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "node --require ./node_modules/typeorm/cli.js",
     "migrate": "npm run build:tsc && cd ./dist && typeorm migration:run",
-    "migrate:revert": "cd ./dist && typeorm migration:revert",
+    "migrate:revert": "npm run build:tsc && cd ./dist && typeorm migration:revert -t='each'",
     "build:tsc": "tsc -p ."
   },
   "dependencies": {

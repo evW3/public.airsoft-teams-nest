@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { createUniqueName } from '../../utils/methods';
 import { defaultPhotoUrl } from '../../constants';
 import { Roles } from '../roles/roles.model';
@@ -27,9 +27,8 @@ export class Users {
     @Column({ default: defaultPhotoUrl })
     profile_image: string
 
-    @OneToOne(() => Roles)
-    @JoinColumn({name: 'role_id'})
-    role: Roles
+    @ManyToOne(() => Roles, role => role.users)
+    role: Roles;
 
     @OneToOne(() => Teams)
     @JoinColumn({name: 'team_id'})

@@ -1,5 +1,15 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Permissions } from '../../models/permissions.model';
+import { Users } from '../users/users.model';
 
 @Entity()
 export class Roles {
@@ -12,4 +22,7 @@ export class Roles {
     @ManyToMany(() => Permissions)
     @JoinTable({name: 'roles_permission'})
     rolePermissions: Permissions[];
+
+    @OneToMany(() => Users, users => users.role)
+    users: Users;
 }
