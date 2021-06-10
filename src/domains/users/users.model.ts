@@ -4,7 +4,7 @@ import { defaultPhotoUrl } from '../../constants';
 import { Roles } from '../roles/roles.model';
 import { Devices } from '../../models/devices.model';
 import { Teams } from '../../models/teams.model';
-import { VerificationCodes } from '../../models/verificationCodes.model';
+import { VerificationCodes } from './verificationCodes.model';
 import { Queries } from '../../models/queries.model';
 
 @Entity()
@@ -28,6 +28,7 @@ export class Users {
     profile_image: string
 
     @ManyToOne(() => Roles, role => role.users)
+    @JoinColumn({name: 'role_id'})
     role: Roles;
 
     @OneToOne(() => Teams)

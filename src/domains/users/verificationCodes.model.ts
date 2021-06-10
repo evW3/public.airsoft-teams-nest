@@ -1,5 +1,5 @@
 import { Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Users } from '../domains/users/users.model';
+import { Users } from './users.model';
 
 @Entity()
 export class VerificationCodes {
@@ -11,6 +11,6 @@ export class VerificationCodes {
     code: string
 
     @ManyToOne(() => Users, users => users.codes)
-    @JoinColumn()
+    @JoinColumn({name:'user_id'})
     user: Users
 }

@@ -24,5 +24,5 @@ export class Roles {
     rolePermissions: Permissions[];
 
     @OneToMany(() => Users, users => users.role)
-    users: Users;
+    users: Users[];
 }

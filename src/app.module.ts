@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,8 +15,10 @@ import { Queries } from './models/queries.model';
 import { QueryParams } from './models/queryParams.model';
 import { Roles } from './domains/roles/roles.model';
 import { Teams } from './models/teams.model';
-import { VerificationCodes } from './models/verificationCodes.model';
+import { VerificationCodes } from './domains/users/verificationCodes.model';
 import { RolesModule } from './domains/roles/roles.module';
+import { TokenMiddleware } from './middlewares/token.middleware';
+import { JwtModule } from '@nestjs/jwt';
 
 
 @Module({
@@ -25,6 +27,10 @@ import { RolesModule } from './domains/roles/roles.module';
     imports: [
         ConfigModule.forRoot({
             envFilePath: [`.${ process.env.NODE_ENV }.env`, '.env']
+        }),
+        JwtModule.register({
+            secret: process.env.TOKEN_SECRET_KEY,
+            signOptions: { expiresIn: process.env.TOKEN_SECRET_EXPIRES_IN },
         }),
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -53,4 +59,10 @@ import { RolesModule } from './domains/roles/roles.module';
         AuthModule
     ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(TokenMiddleware)
+            .forRoutes('auth/test');
+    }
+}

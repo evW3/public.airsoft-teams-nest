@@ -1,13 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BcryptStrategies } from './bcryptStrategies';
 import { JwtService } from '@nestjs/jwt';
+import { getManager } from 'typeorm';
 
 import { UsersService } from '../users/users.service';
 import { RolesService } from '../roles/roles.service';
-import { CreateUserDto } from '../users/dto/createUser.dto';
-import { TransferUserDto } from '../users/dto/transferUser.dto';
 import { Users } from '../users/users.model';
-import { getManager } from 'typeorm';
+import { Roles } from '../roles/roles.model';
+import { TransferUserDto } from '../users/dto/transferUser.dto';
+import { TransferUserSignInDto } from '../users/dto/transferUserSignIn.dto';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
@@ -15,33 +17,31 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly rolesService: RolesService,
         private readonly bcryptStrategies: BcryptStrategies,
-        private readonly jwtService: JwtService
+        private readonly tokenService: TokenService
     ) {}
 
     async registration(userTransferDto: TransferUserDto) {
-        let userCreateDto: CreateUserDto = new CreateUserDto();
-        const playerId = await this.rolesService.getRoleIdByName('PLAYER');
-        const isUserEmailUnique = await this.usersService.isUserEmailUnique(userTransferDto.email);
-        if(isUserEmailUnique) {
+        try {
+            const playerId = await this.rolesService.getRoleIdByName('PLAYER');
             const cryptResult = await this.bcryptStrategies.encrypt(userTransferDto.password);
+            const userEntity = new Users();
+            const roleEntity = await getManager().findOne(Roles, playerId);
 
-            const entityManager = getManager();
-            const userEntity = await entityManager.findOne(Users, 1);
+            userEntity.email = userTransferDto.email;
+            userEntity.password = cryptResult.encryptedPassword;
+            userEntity.password_salt = cryptResult.salt;
+            userEntity.role = roleEntity;
 
-            userCreateDto.Email = userTransferDto.email;
-            userCreateDto.Password = cryptResult.encryptedPassword;
-            userCreateDto.Password_salt = cryptResult.salt;
-            userCreateDto.Role_id = playerId;
-
-            const user = await this.usersService.create(userCreateDto);
-            const token = this.createToken(1);
+            const userId = await this.usersService.create(userEntity);
+            const token = this.tokenService.createToken(userId);
 
             return { token };
-        } else
-            throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST)
+        } catch (e) {
+            throw new HttpException('Server error!', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    private createToken(userId: number): string {
-        return this.jwtService.sign({ id: userId });
+    async auth(transferUserSignInDto: TransferUserSignInDto) {
+
     }
 }
