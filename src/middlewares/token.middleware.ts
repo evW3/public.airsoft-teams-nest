@@ -12,10 +12,10 @@ export class TokenMiddleware implements NestMiddleware {
             const token: string | undefined = req?.headers?.authorization?.split(' ')[1];
 
             if(token) {
-                const params = <tokenBody>this.jwtService.verify(token);
+                const params = this.jwtService.verify(token);
 
                 if(params.id) {
-                    req.body = { ...req.body, id: params.id };
+                    req.body = { ...req.body, ...params };
                     next();
                 } else
                     next(new HttpException('Invalid token', HttpStatus.FORBIDDEN));

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -7,7 +7,11 @@ import { SMTPService } from './SMTP.service';
 import { VerificationCodesService } from './verificationCodes.service';
 import { Users } from './users.model';
 import { VerificationCodes } from './verificationCodes.model';
-import { TokenService } from '../auth/token.service';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from '../auth/auth.module';
+import { UsersController } from './users.controller';
+import { TokenMiddleware } from '../../middlewares/token.middleware';
+import { IsUserHaveVerificationCode } from './middlewares/isUserHaveVerificationCode';
 
 @Module({
     imports: [
@@ -15,9 +19,23 @@ import { TokenService } from '../auth/token.service';
         ConfigModule.forRoot({
             envFilePath: [`.${process.env.NODE_ENV}.env`]
         }),
-        TokenService
+        JwtModule.register({
+            secret: process.env.TOKEN_CODE_KEY,
+            signOptions: { expiresIn: process.env.TOKEN_CODE_EXPIRES_IN }
+        }),
+        forwardRef(() => AuthModule)
     ],
+    controllers: [UsersController],
     providers: [UsersService, SMTPService, VerificationCodesService],
     exports: [UsersService, SMTPService]
 })
-export class UsersModule {}
+export class UsersModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(TokenMiddleware)
+            .forRoutes('users/recover-password');
+        consumer
+            .apply(IsUserHaveVerificationCode)
+            .forRoutes('users/recover-password');
+    }
+}

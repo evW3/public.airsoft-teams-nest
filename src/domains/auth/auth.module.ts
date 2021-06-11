@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 
@@ -14,8 +14,11 @@ import { TokenService } from './token.service';
         ConfigModule.forRoot({
             envFilePath: ['.env']
         }),
-        JwtModule,
-        UsersModule,
+        JwtModule.register({
+            secret: process.env.TOKEN_SECRET_KEY,
+            signOptions: { expiresIn: process.env.TOKEN_SECRET_EXPIRES_IN }
+        }),
+        forwardRef(() => UsersModule),
         RolesModule
     ],
     providers: [AuthService, BcryptStrategies, TokenService],

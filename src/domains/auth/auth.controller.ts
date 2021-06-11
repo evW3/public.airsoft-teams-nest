@@ -1,11 +1,11 @@
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { transferUserSchema } from './schemas/TransferUserSchema';
+import { TransferUserSchema } from './schemas/transferUserSchema';
 import { TransferUserDto } from '../users/dto/transferUser.dto';
 import { TransferUserSignInDto } from '../users/dto/transferUserSignIn.dto';
 import { UniqueEmailValidation } from './pipes/uniqueEmailValidation';
-import { PasswordMismatchValidation } from './pipes/passwordMismatchValidation';
+import { SchemaValidate } from './pipes/passwordMismatchValidation';
 import { IsExistEmailValidation } from './pipes/isExistEmailValidation';
 
 
@@ -14,7 +14,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('sign-up')
-    @UsePipes(new PasswordMismatchValidation(transferUserSchema))
+    @UsePipes(new SchemaValidate(TransferUserSchema))
     @UsePipes(UniqueEmailValidation)
     async signUp(@Body() userTransferDto: TransferUserDto) {
         return await this.authService.registration(userTransferDto);

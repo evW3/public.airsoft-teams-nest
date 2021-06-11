@@ -38,8 +38,26 @@ export class UsersService {
         return user.password_salt;
     }
 
+    async isUserHasCode(userId: number, codeId: number) {
+        const user = await this.usersRepository.count(
+            {
+                where: { id: userId },
+                join: {
+                    alias: 'code',
+                    leftJoin: {
+                        id: 'users.verification_codes'
+                    }
+                }
+        });
+        console.log(user);
+    }
+
     async isExistsEmail(email: string): Promise<boolean> {
         const count = await this.usersRepository.count({ where: { email } });
         return count === 1;
+    }
+
+    async changeUserPassword(user: Users): Promise<void> {
+        await this.usersRepository.save(user);
     }
 }

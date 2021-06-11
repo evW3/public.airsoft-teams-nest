@@ -40,7 +40,7 @@ export class Users {
     devices: Devices[]
 
     @OneToMany(() => VerificationCodes, verificationCodes => verificationCodes.user)
-    @JoinColumn()
+    @JoinColumn({name:'verification_codes'})
     codes: VerificationCodes[]
 
     @OneToMany(() => Queries, queries => queries.user)

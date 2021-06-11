@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-export const transferUserSchema = Joi.object({
+export const TransferUserSchema = Joi.object({
 
     password: Joi.string().required(),
 

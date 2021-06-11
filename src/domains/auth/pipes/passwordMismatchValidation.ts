@@ -10,7 +10,7 @@ import { ObjectSchema } from 'joi';
 import { TransferUserDto } from '../../users/dto/transferUser.dto';
 
 @Injectable()
-export class PasswordMismatchValidation implements PipeTransform {
+export class SchemaValidate implements PipeTransform {
     constructor(private schema: ObjectSchema) {}
 
     transform(value: TransferUserDto, metadata: ArgumentMetadata) {
