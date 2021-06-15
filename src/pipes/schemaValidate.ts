@@ -2,18 +2,17 @@ import {
     PipeTransform,
     Injectable,
     ArgumentMetadata,
-    BadRequestException,
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
 import { ObjectSchema } from 'joi';
-import { TransferUserDto } from '../../users/dto/transferUser.dto';
+import { TransportUserDto } from '../domains/users/dto/transportUser.dto';
 
 @Injectable()
 export class SchemaValidate implements PipeTransform {
     constructor(private schema: ObjectSchema) {}
 
-    transform(value: TransferUserDto, metadata: ArgumentMetadata) {
+    transform(value: any, metadata: ArgumentMetadata) {
         const { error } = this.schema.validate(value);
         if (error) {
             throw new HttpException('The expected request body does not match the received one', HttpStatus.BAD_REQUEST);

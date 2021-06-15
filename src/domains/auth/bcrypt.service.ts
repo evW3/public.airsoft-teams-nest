@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class BcryptStrategies {
+export class BcryptService {
     private readonly saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
     private readonly globalSalt = process.env.BCRYPT_GLOBAL_SALT;
 

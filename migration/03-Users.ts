@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey, TableIndex } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
 import { defaultPhotoUrl } from '../src/constants';
-import * as dotenv from 'dotenv'
 
 export class Users1623102765503 implements MigrationInterface {
 

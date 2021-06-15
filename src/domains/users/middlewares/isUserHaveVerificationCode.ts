@@ -9,7 +9,15 @@ export class IsUserHaveVerificationCode implements NestMiddleware {
 
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            await this.usersService.isUserHasCode(req.body.id, req.body.codeId);
+            const userId = req.body.id;
+            const codeId = req.body.codeId;
+            const isUserHaveVerificationCode = await this.usersService.isUserHasCode(userId, codeId);
+            console.log(isUserHaveVerificationCode);
+            if (isUserHaveVerificationCode) {
+                next();
+            } else {
+                next(new HttpException('Can`t find user code', HttpStatus.BAD_REQUEST));
+            }
         } catch (e) {
             if(e instanceof HttpException)
                 next(e);

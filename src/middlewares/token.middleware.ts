@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { tokenBody } from '../utils/types';
 
 @Injectable()
 export class TokenMiddleware implements NestMiddleware {
@@ -15,6 +14,8 @@ export class TokenMiddleware implements NestMiddleware {
                 const params = this.jwtService.verify(token);
 
                 if(params.id) {
+                    delete params.iat;
+                    delete params.exp;
                     req.body = { ...req.body, ...params };
                     next();
                 } else

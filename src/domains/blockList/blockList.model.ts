@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Users } from '../domains/users/users.model';
+import { Users } from '../users/users.model';
 
 @Entity()
 export class BlockList {
@@ -9,7 +9,7 @@ export class BlockList {
     @Column()
     description: string
 
-    @OneToOne(() => Users)
-    @JoinColumn()
+    @OneToOne(() => Users, users => users.blockList)
+    @JoinColumn({name: 'user_id'})
     user: Users
 }

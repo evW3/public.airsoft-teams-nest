@@ -1,16 +1,18 @@
 import { IKeyValue } from './utils/interfaces';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
-const url: string = `http://localhost:${process.env.PORT}`;
+export const url: string = `http://localhost:${process.env.PORT}`;
 
 export const defaultPhotoUrl: string = `${url}/uploads/default.jpg`;
 
-export const mongoDBConnection = () => ({
-    username: process.env.MONGODB_USERNAME,
-    password: process.env.MONGODB_PASSWORD,
-    collection: process.env.MONGODB_COLLECTION
-})
+export const ROLES_KEY = 'roles';
+
+export const QUERY_KEY = 'queries';
 
 export const mode = process.env.NODE_ENV;
+
+export const srcFolder = __dirname;
 
 export const PermissionsList: IKeyValue = {
     activate_manager: [ 'ADMIN' ],

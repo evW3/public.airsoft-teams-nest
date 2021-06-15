@@ -1,7 +1,9 @@
 import { IsString } from 'class-validator';
 
-export class TransferSendRecoverToken {
-
+export class TransportUserSignInDto {
     @IsString()
     email: string;
+
+    @IsString()
+    password: string;
 }

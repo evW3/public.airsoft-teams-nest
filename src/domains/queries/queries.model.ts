@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { queryTypes, statuses } from '../utils/enums';
-import { Users } from '../domains/users/users.model';
+import { queryTypes, statuses } from '../../utils/enums';
+import { Users } from '../users/users.model';
 
 @Entity()
 export class Queries {
@@ -21,6 +21,6 @@ export class Queries {
     status: statuses
 
     @ManyToOne(() => Users, user => user.queries)
-    @JoinColumn()
+    @JoinColumn({name:'user_id'})
     user: Users;
 }

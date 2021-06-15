@@ -1,13 +1,15 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-import { BcryptStrategies } from './bcryptStrategies';
+import { BcryptService } from './bcrypt.service';
 import { RolesModule } from '../roles/roles.module';
 import { TokenService } from './token.service';
+import { UniqueEmailMiddleware } from '../../middlewares/uniqueEmail.middleware';
+import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middleware';
 
 @Module({
     imports: [
@@ -21,8 +23,17 @@ import { TokenService } from './token.service';
         forwardRef(() => UsersModule),
         RolesModule
     ],
-    providers: [AuthService, BcryptStrategies, TokenService],
+    providers: [AuthService, BcryptService, TokenService],
     controllers: [AuthController],
-    exports: [TokenService]
+    exports: [TokenService, BcryptService]
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(UniqueEmailMiddleware)
+            .forRoutes('auth/sign-up');
+        consumer
+            .apply(IsExistsEmailMiddleware)
+            .forRoutes('auth/sign-in');
+    }
+}

@@ -12,6 +12,7 @@ import { AuthModule } from '../auth/auth.module';
 import { UsersController } from './users.controller';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { IsUserHaveVerificationCode } from './middlewares/isUserHaveVerificationCode';
+import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middleware';
 
 @Module({
     imports: [
@@ -32,10 +33,15 @@ import { IsUserHaveVerificationCode } from './middlewares/isUserHaveVerification
 export class UsersModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
-            .apply(TokenMiddleware)
-            .forRoutes('users/recover-password');
-        consumer
             .apply(IsUserHaveVerificationCode)
             .forRoutes('users/recover-password');
+        consumer
+            .apply(IsExistsEmailMiddleware)
+            .forRoutes('users/send-recover-code');
+        consumer
+            .apply(TokenMiddleware)
+            .forRoutes('users/profile',
+                        'users/upload-user-photo',
+                        'users/recover-password');
     }
 }

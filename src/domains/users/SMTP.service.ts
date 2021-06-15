@@ -23,8 +23,4 @@ export class SMTPService {
             throw new HttpException('Can`t send mail', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    createHtmlLink(path: string, param: string, paramValue: string, text: string): string {
-        return `<a href="${1}${path}?${param}=${paramValue}">${text}</a>`;//change 1 to url
-    }
 }

@@ -7,18 +7,21 @@ import { ErrorModule } from './domains/errors/error.module';
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import { Users } from './domains/users/users.model';
-import { BlockList } from './models/blockList.model';
+import { BlockList } from './domains/blockList/blockList.model';
 import { Comments } from './models/comments.model';
 import { Devices } from './models/devices.model';
-import { Permissions } from './models/permissions.model';
-import { Queries } from './models/queries.model';
+import { Permissions } from './domains/roles/permissions.model';
+import { Queries } from './domains/queries/queries.model';
 import { QueryParams } from './models/queryParams.model';
 import { Roles } from './domains/roles/roles.model';
-import { Teams } from './models/teams.model';
+import { Teams } from './domains/teams/teams.model';
 import { VerificationCodes } from './domains/users/verificationCodes.model';
 import { RolesModule } from './domains/roles/roles.module';
 import { TokenMiddleware } from './middlewares/token.middleware';
 import { JwtModule } from '@nestjs/jwt';
+import { QueriesModule } from './domains/queries/queries.module';
+import { TeamsModule } from './domains/teams/teams.module';
+import { BlockListModule } from './domains/blockList/blockList.module';
 
 
 @Module({
@@ -52,10 +55,13 @@ import { JwtModule } from '@nestjs/jwt';
                 VerificationCodes
             ]
         }),
-        MongooseModule.forRoot(process.env.MONGO_URI),
-        ErrorModule,
+
+
         UsersModule,
+        BlockListModule,
         RolesModule,
+        QueriesModule,
+        TeamsModule,
         AuthModule
     ]
 })
@@ -66,3 +72,6 @@ export class AppModule implements NestModule {
             .forRoutes('auth/test');
     }
 }
+
+//MongooseModule.forRoot(process.env.MONGO_URI),
+//ErrorModule

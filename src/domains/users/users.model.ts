@@ -3,9 +3,10 @@ import { createUniqueName } from '../../utils/methods';
 import { defaultPhotoUrl } from '../../constants';
 import { Roles } from '../roles/roles.model';
 import { Devices } from '../../models/devices.model';
-import { Teams } from '../../models/teams.model';
+import { Teams } from '../teams/teams.model';
 import { VerificationCodes } from './verificationCodes.model';
-import { Queries } from '../../models/queries.model';
+import { Queries } from '../queries/queries.model'
+import { BlockList } from '../blockList/blockList.model';
 
 @Entity()
 export class Users {
@@ -31,7 +32,7 @@ export class Users {
     @JoinColumn({name: 'role_id'})
     role: Roles;
 
-    @OneToOne(() => Teams)
+    @ManyToOne(() => Teams, team => team.users)
     @JoinColumn({name: 'team_id'})
     team: Teams
 
@@ -40,10 +41,13 @@ export class Users {
     devices: Devices[]
 
     @OneToMany(() => VerificationCodes, verificationCodes => verificationCodes.user)
-    @JoinColumn({name:'verification_codes'})
+    @JoinColumn()
     codes: VerificationCodes[]
 
     @OneToMany(() => Queries, queries => queries.user)
     @JoinColumn()
     queries: Queries[]
+
+    @OneToOne(() => BlockList, blockList => blockList.user)
+    blockList: BlockList;
 }

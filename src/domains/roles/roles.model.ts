@@ -8,7 +8,7 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Permissions } from '../../models/permissions.model';
+import { Permissions } from './permissions.model';
 import { Users } from '../users/users.model';
 
 @Entity()

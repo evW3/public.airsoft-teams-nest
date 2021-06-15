@@ -1,50 +1,62 @@
-import { Body, Controller, HttpException, HttpStatus, Post, Put, UsePipes } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpStatus,
+    Patch,
+    Post,
+    Put,
+    UploadedFile,
+    UseInterceptors,
+    UsePipes,
+} from '@nestjs/common';
+import { Express } from 'express'
+import { v4 as uuid } from 'uuid';
+import { FileInterceptor } from '@nestjs/platform-express';
+import path from "path";
 
-import { IsExistEmailValidation } from '../auth/pipes/isExistEmailValidation';
-import { TransferSendRecoverToken } from './dto/transferSendRecoverToken';
+import { TransportSendRecoverTokenDto } from './dto/transportSendRecoverToken.dto';
 import { UsersService } from './users.service';
-import { VerificationCodes } from './verificationCodes.model';
-import { VerificationCodesService } from './verificationCodes.service';
-import { TokenService } from '../auth/token.service';
-import { SMTPService } from './SMTP.service';
-import { TransferRecoverPassword } from './dto/transferRecoverPassword';
-import { SchemaValidate } from '../auth/pipes/passwordMismatchValidation';
+import { TransportRecoverPasswordDto } from './dto/transportRecoverPassword.dto';
+import { SchemaValidate } from '../../pipes/schemaValidate';
 import { ChangePasswordSchema } from './schemas/changePasswordSchema';
-import { Users } from './users.model';
+import { TransportIdDto } from './dto/transportId.dto';
+import { TransportUpdateProfileDto } from './dto/transportUpdateProfile.dto';
+import { srcFolder, url } from '../../constants';
+import * as fs from 'fs';
+import { BodyINter } from '../../interceptors/body';
+
 
 @Controller('users')
 export class UsersController {
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly verificationCodesService: VerificationCodesService,
-        private readonly tokenService: TokenService,
-        private readonly smtpService: SMTPService
-    ) {}
+    constructor(private readonly usersService: UsersService) {}
 
     @Post('/send-recover-code')
-    @UsePipes(IsExistEmailValidation)
-    async sendRecoverCode(@Body() transferSendRecoverToken: TransferSendRecoverToken) {
-        try {
-
-            const user = await this.usersService.getUserByEmail(transferSendRecoverToken.email);
-            const verificationCodeEntity = new VerificationCodes();
-            verificationCodeEntity.user = user;
-            const codeId = await this.verificationCodesService.create(verificationCodeEntity);
-            const recoverToken = this.tokenService.createRecoverToken(user.id, codeId);
-            await this.smtpService.sendMail(recoverToken, 'Recover Password', user.email);
-            return 'Check ur email, token was sent';
-        } catch (e) {
-            if(e instanceof HttpException)
-                return e;
-            else
-                new HttpException('Server error!', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    async sendRecoverCode(@Body() transportSendRecoverToken: TransportSendRecoverTokenDto) {
+        return await this.usersService.sendRecoverCode(transportSendRecoverToken);
     }
 
     @Put('/recover-password')
     @UsePipes(new SchemaValidate(ChangePasswordSchema))
-    async recoverPassword(@Body() transferRecoverPassword: TransferRecoverPassword) {
-        const userEntity = new Users();
+    async recoverPassword(@Body() transportRecoverPassword: TransportRecoverPasswordDto) {
+        return this.usersService.recoverPassword(transportRecoverPassword);
+    }
 
+    @Get('/profile')
+    async getProfile(@Body() transportId: TransportIdDto) {
+        return await this.usersService.getUser(transportId.id);
+    }
+
+    @Put('/profile')
+    async updateProfile(@Body() transportUpdateProfile: TransportUpdateProfileDto) {
+        await this.usersService.updateProfile(transportUpdateProfile);
+        return { message: 'Profile was updated', status: HttpStatus.OK };
+    }
+
+    @Patch('/upload-user-photo')
+    @UseInterceptors(FileInterceptor('photo'))
+    async uploadFile(@UploadedFile() file: Express.Multer.File) {
+        //console.log(l);
+        await this.usersService.loadPhoto(file);
     }
 }
