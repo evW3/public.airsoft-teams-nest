@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Queries } from '../domains/queries/queries.model'
+import { Queries } from './queries.model'
 
 @Entity()
 export class QueryParams {
@@ -10,6 +10,6 @@ export class QueryParams {
     parameter: string
 
     @OneToOne(() => Queries)
-    @JoinColumn()
+    @JoinColumn({name: 'query_id'})
     query: Queries
 }

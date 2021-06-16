@@ -1,9 +1,9 @@
 import { IsNumber } from 'class-validator';
 
-export class TransportQueryDto {
-    @IsNumber()
-    id: number;
-
+export class TransportPlayerQueryDto {
     @IsNumber()
     queryId: number;
+
+    @IsNumber()
+    id: number;
 }

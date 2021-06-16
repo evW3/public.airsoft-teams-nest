@@ -8,10 +8,17 @@ import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
+import { CommentsService } from './comments.service';
+import { Comments } from './comments.model';
+import { QueryParamsService } from './queryParams.service';
+import { QueryParams } from './queryParams.model';
+import { IsUserInTeamMiddleware } from './middlewares/isUserInTeam.middleware';
+import { IsTeamNameExistsMiddleware } from '../teams/middleware/isTeamNameExists.middleware';
+import { IsUserWithoutTeamMiddleware } from './middlewares/isUserWithoutTeam.middleware';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Users, Queries]),
+        TypeOrmModule.forFeature([Users, Queries, Comments, QueryParams]),
         ConfigModule.forRoot({
             envFilePath: ['.env']
         }),
@@ -22,8 +29,8 @@ import { UsersModule } from '../users/users.module';
         UsersModule
     ],
     controllers: [QueriesController],
-    providers: [QueriesService],
-    exports: [QueriesService]
+    providers: [QueriesService, CommentsService, QueryParamsService],
+    exports: [QueriesService, CommentsService]
 })
 export class QueriesModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
@@ -33,5 +40,17 @@ export class QueriesModule implements NestModule {
                         'queries/change-role',
                         'queries/join-team',
                         'queries/exit-team');
+
+        consumer
+            .apply(IsUserInTeamMiddleware)
+            .forRoutes('queries/join-team', 'queries/change-role');
+
+        consumer
+            .apply(IsTeamNameExistsMiddleware)
+            .forRoutes('queries/join-team');
+
+        consumer
+            .apply(IsUserWithoutTeamMiddleware)
+            .forRoutes('queries/exit-team');
     }
 }

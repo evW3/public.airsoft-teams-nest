@@ -166,4 +166,31 @@ export class UsersService {
         });
         return user.queries;
     }
+
+    async isUserInBlockList(id: number): Promise<boolean> {
+        const user = await this.usersRepository.findOne({
+            where: {id},
+            join: {
+                alias: "user",
+                leftJoinAndSelect: {
+                    blockList: "user.blockList",
+                }
+            }
+        });
+        console.log(user.blockList);
+        return !!user.blockList;
+    }
+
+    async isUserHaveTeam(id: number): Promise<boolean> {
+        const user = await this.usersRepository.findOne({
+            where: {id},
+            join: {
+                alias: 'user',
+                leftJoinAndSelect: {
+                    team: 'user.team'
+                }
+            }
+        });
+        return !!user.team;
+    }
 }

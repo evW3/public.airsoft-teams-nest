@@ -6,6 +6,7 @@ import { TeamsService } from './teams.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
+import { IsUniqueNameMiddleware } from './middleware/isUniqueName.middleware';
 
 
 @Module({
@@ -18,12 +19,13 @@ import { TokenMiddleware } from '../../middlewares/token.middleware';
         UsersModule
     ],
     controllers: [TeamsController],
-    providers: [TeamsService]
+    providers: [TeamsService],
+    exports: [TeamsService]
 })
 export class TeamsModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
-            .apply(TokenMiddleware)
+            .apply(TokenMiddleware, IsUniqueNameMiddleware)
             .forRoutes('teams/');
     }
 }

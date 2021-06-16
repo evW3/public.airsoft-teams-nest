@@ -1,58 +1,44 @@
 import { MigrationInterface, QueryRunner} from 'typeorm';
+import { RolePermissions16231027655007 } from './07-RolePermissions';
+import { Permissions1623102765505 } from './05-Permissions';
+import { QueryParams16231027655013 } from './13-QueryParams';
+import { Queries16231027655009 } from './9-Queries';
+import { Comments16231027655010 } from './10-Comments';
+import { BlockList16231027655011 } from './11-BlockList';
+import { Devices16231027655012 } from './12-Devices';
+import { VerificationCodes16231027655014 } from './14-VerificationCodes';
+import { Users1623102765503 } from './03-Users';
+import { Teams1623102765501 } from './01-Teams';
+import { Roles1623102765500 } from './00-Roles';
 
 export class ClearAll16231027656000 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {}
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('roles_permission');
+        const rolePermission = new RolePermissions16231027655007();
+        const permission = new Permissions1623102765505();
+        const queryParams = new QueryParams16231027655013();
+        const queries = new Queries16231027655009();
+        const comments = new Comments16231027655010();
+        const blockList = new BlockList16231027655011();
+        const devices = new Devices16231027655012();
+        const verificationCodes = new VerificationCodes16231027655014();
+        const users = new Users1623102765503();
+        const teams = new Teams1623102765501();
+        const roles = new Roles1623102765500();
 
-        await queryRunner.dropTable('permissions');
-
-        const table5 = await queryRunner.getTable('query_params');
-        const foreignKeyQuery5 = table5.foreignKeys.find(fk => fk.columnNames.indexOf('query_id') !== -1);
-        await queryRunner.dropForeignKey('query_params', foreignKeyQuery5);
-        await queryRunner.dropColumn('query_params', 'query_id');
-        await queryRunner.dropTable('query_params');
-
-        const table2 = await queryRunner.getTable('queries');
-        const foreignKey2 = table2.foreignKeys.find(fk => fk.columnNames.indexOf('comment_id') !== -1);
-        await queryRunner.dropForeignKey('queries', foreignKey2);
-        await queryRunner.dropColumn('queries', 'comment_id');
-        await queryRunner.dropTable('queries');
-
-        await queryRunner.dropTable('comments');
-
-        const table3 = await queryRunner.getTable('block_list');
-        const foreignKeyUser3 = table3.foreignKeys.find(fk => fk.columnNames.indexOf('user_id') !== -1);
-        await queryRunner.dropForeignKey('block_list', foreignKeyUser3);
-        await queryRunner.dropColumn('block_list', 'user_id');
-        await queryRunner.dropTable('block_list');
-
-        const table4 = await queryRunner.getTable('devices');
-        const foreignKeyUser4 = table4.foreignKeys.find(fk => fk.columnNames.indexOf('user_id') !== -1);
-        await queryRunner.dropForeignKey('devices', foreignKeyUser4);
-        await queryRunner.dropColumn('devices', 'user_id');
-        await queryRunner.dropTable('devices');
-
-        const table11 = await queryRunner.getTable('verification_codes');
-        const foreignKeyUser11 = table11.foreignKeys.find(fk => fk.columnNames.indexOf('user_id') !== -1);
-        await queryRunner.dropForeignKey('verification_codes', foreignKeyUser11);
-        await queryRunner.dropColumn('verification_codes', 'user_id');
-        await queryRunner.dropTable('verification_codes');
-
-        const table = await queryRunner.getTable('users');
-        const foreignKeyRole = table.foreignKeys.find(fk => fk.columnNames.indexOf('role_id') !== -1);
-        const foreignKeyTeam = table.foreignKeys.find(fk => fk.columnNames.indexOf('team_id') !== -1);
-        await queryRunner.dropForeignKey('users', foreignKeyRole);
-        await queryRunner.dropForeignKey('users', foreignKeyTeam);
-        await queryRunner.dropColumn('users', 'role_id');
-        await queryRunner.dropColumn('users', 'team_id');
-        await queryRunner.dropTable('users');
-
-        await queryRunner.dropTable('teams');
-
-        await queryRunner.dropTable('roles');
+        await rolePermission.down(queryRunner);
+        await permission.down(queryRunner);
+        await queryParams.down(queryRunner);
+        await comments.down(queryRunner);
+        await queries.down(queryRunner);
+        await blockList.down(queryRunner);
+        await devices.down(queryRunner);
+        await verificationCodes.down(queryRunner);
+        await users.down(queryRunner);
+        await teams.down(queryRunner);
+        await roles.down(queryRunner);
 
         await queryRunner.clearTable('migrations');
     }

@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey, TableIndex } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
 import { defaultPhotoUrl } from '../src/constants';
 

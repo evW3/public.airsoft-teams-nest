@@ -11,27 +11,24 @@ import {
     UsePipes,
 } from '@nestjs/common';
 import { Express } from 'express'
-import { v4 as uuid } from 'uuid';
 import { FileInterceptor } from '@nestjs/platform-express';
-import path from "path";
 
 import { TransportSendRecoverTokenDto } from './dto/transportSendRecoverToken.dto';
 import { UsersService } from './users.service';
 import { TransportRecoverPasswordDto } from './dto/transportRecoverPassword.dto';
 import { SchemaValidate } from '../../pipes/schemaValidate';
-import { ChangePasswordSchema } from './schemas/changePasswordSchema';
+import { ChangePasswordSchema } from './schemas/changePassword.schema';
 import { TransportIdDto } from './dto/transportId.dto';
 import { TransportUpdateProfileDto } from './dto/transportUpdateProfile.dto';
-import { srcFolder, url } from '../../constants';
-import * as fs from 'fs';
-import { BodyINter } from '../../interceptors/body';
-
+import { UpdateProfileSchema } from './schemas/updateProfile.schema';
+import { SendRecoverTokenSchema } from './schemas/sendRecoverToken.schema';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Post('/send-recover-code')
+    @UsePipes(new SchemaValidate(SendRecoverTokenSchema))
     async sendRecoverCode(@Body() transportSendRecoverToken: TransportSendRecoverTokenDto) {
         return await this.usersService.sendRecoverCode(transportSendRecoverToken);
     }
@@ -48,6 +45,7 @@ export class UsersController {
     }
 
     @Put('/profile')
+    @UsePipes(new SchemaValidate(UpdateProfileSchema))
     async updateProfile(@Body() transportUpdateProfile: TransportUpdateProfileDto) {
         await this.usersService.updateProfile(transportUpdateProfile);
         return { message: 'Profile was updated', status: HttpStatus.OK };

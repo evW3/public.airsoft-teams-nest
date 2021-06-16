@@ -1,22 +1,19 @@
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
-
-import { TeamsService } from '../teams.service';
+import { UsersService } from '../domains/users/users.service';
 
 @Injectable()
-export class IsUniqueName implements CanActivate {
-    constructor(private readonly teamsService: TeamsService) {}
+export class BlockListGuard implements CanActivate {
+    constructor(private readonly usersService: UsersService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
             const req = context.switchToHttp().getRequest();
-            const name = req.body.name;
-
-            const isExistTeamWithThisName = await this.teamsService.isExistsTeam(name);
-            if(isExistTeamWithThisName) {
-                throw new HttpException('Team with this name already exists', HttpStatus.BAD_REQUEST);
-            } else {
-                return true;
+            const id = req.body.id
+            if(id) {
+                const isUserInBanList = await this.usersService.isUserInBlockList(id);
+                return !isUserInBanList;
             }
+            return true;
         } catch (e) {
             if(e instanceof HttpException)
                 throw e;

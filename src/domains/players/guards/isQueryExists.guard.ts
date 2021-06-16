@@ -6,10 +6,9 @@ import { statuses } from '../../../utils/enums';
 
 
 @Injectable()
-export class IsQueryUnique implements CanActivate {
+export class IsQueryExistsGuard implements CanActivate {
     constructor(private readonly usersService: UsersService,
-                private readonly reflector: Reflector) {
-    }
+                private readonly reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
@@ -25,11 +24,11 @@ export class IsQueryUnique implements CanActivate {
                 if(queries) {
                     for(let query of queries) {
                         if(query.type === typeQuery && query.status === statuses.PROCESSED) {
-                            return false;
+                            return true;
                         }
                     }
                 }
-                return true;
+                return false;
             }
 
             return false;

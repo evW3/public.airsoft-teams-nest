@@ -1,6 +1,6 @@
 import { IsString, IsNumber } from 'class-validator';
 
-export class TransportPlayer {
+export class TransportPlayerDto {
     @IsNumber()
     id: number;
 

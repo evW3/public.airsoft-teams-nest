@@ -12,6 +12,6 @@ export class BlockListService {
     }
 
     async unblock(blockEntity: BlockList): Promise<void> {
-        await this.blockListRepository.recover(blockEntity);
+        await this.blockListRepository.remove(blockEntity);
     }
 }

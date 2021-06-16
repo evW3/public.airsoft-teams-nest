@@ -1,7 +1,6 @@
 import * as Joi from 'joi';
 
 export const ChangePasswordSchema = Joi.object({
-
     password: Joi.string().required(),
 
     repeatPassword: Joi.ref('password'),

@@ -1,6 +1,5 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey, TableIndex } from 'typeorm';
-import { v4 as uuidv4 } from "uuid";
-import { defaultPhotoUrl } from '../src/constants';
+import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+
 
 export class Roles1623102765500 implements MigrationInterface {
 

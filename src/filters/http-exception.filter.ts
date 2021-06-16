@@ -5,20 +5,19 @@ import { mode } from '../constants';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-    constructor(private errorsService: ErrorsService) {}
 
     async catch(exception: HttpException, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
         const status = exception.getStatus();
-        await this.errorsService.create({
-            path: request.url,
-            params: { ...request.body },
-            status,
-            errorDescription: <string>exception.getResponse(),
-            mode
-        });
+        // await this.errorsService.create({
+        //     path: request.url,
+        //     params: { ...request.body },
+        //     status,
+        //     errorDescription: <string>exception.getResponse(),
+        //     mode
+        // });
 
         response
             .status(status)

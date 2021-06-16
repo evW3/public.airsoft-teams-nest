@@ -1,6 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import config from '../config/default';
-import bcrypt from 'bcrypt';
+
 import { getListPermissions } from '../src/utils/methods';
 import { PermissionsList } from '../src/constants';
 
