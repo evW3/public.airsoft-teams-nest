@@ -12,7 +12,12 @@ export class TeamsService {
         return await this.teamsRepository.save(team);
     }
 
-    async isExistsTeam(name: string): Promise<boolean> {
+    async isExistsTeam(id: number): Promise<boolean> {
+        const count = await this.teamsRepository.count({ where: {id} });
+        return count === 1;
+    }
+
+    async isExistsTeamName(name: string): Promise<boolean> {
         const count = await this.teamsRepository.count({ where: {name} });
         return count === 1;
     }

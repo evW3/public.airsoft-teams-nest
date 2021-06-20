@@ -52,12 +52,10 @@ export class PlayersController {
         userEntity.team = teamEntity;
         queryEntity.status = statuses.ACCEPTED;
 
-        await Promise.all([
-            this.usersService.save(userEntity),
-            this.queriesService.saveQuery(queryEntity)
-        ]);
+        await this.usersService.save(userEntity)
 
-        return { message: 'User added to team', status: HttpStatus.OK };
+
+        return await this.queriesService.saveQuery(queryEntity);
     }
 
     @Patch('/decline-join-team')
@@ -69,9 +67,7 @@ export class PlayersController {
         const queryEntity = await this.queriesService.getQuery(transportPlayerQueryDto.queryId);
         queryEntity.status = statuses.DECLINE;
 
-        await this.queriesService.saveQuery(queryEntity);
-
-        return { message: 'User query was declined', status: HttpStatus.OK };
+        return await this.queriesService.saveQuery(queryEntity);
     }
 
     @Patch('/accept-exit-team')
@@ -89,12 +85,9 @@ export class PlayersController {
             userEntity.team = null;
             queryEntity.status = statuses.ACCEPTED;
 
-            await Promise.all([
-                this.usersService.save(userEntity),
-                this.queriesService.saveQuery(queryEntity)
-            ]);
+            await this.usersService.save(userEntity);
 
-            return { message: 'Player exit from team', status: HttpStatus.OK };
+            return await this.queriesService.saveQuery(queryEntity)
         } catch (e) {
             console.log(e);
         }
@@ -110,9 +103,7 @@ export class PlayersController {
 
         queryEntity.status = statuses.DECLINE;
 
-        await this.queriesService.saveQuery(queryEntity)
-
-        return { message: 'Player query was declined', status: HttpStatus.OK };
+        return await this.queriesService.saveQuery(queryEntity);
     }
 
     @Patch('/exclude-from-team')
@@ -122,9 +113,8 @@ export class PlayersController {
     async excludeFromTeam(@Body() transportExcludeFromTeam: TransportExcludeFromTeamDto) {
         const userEntity = await getManager().findOne(Users, transportExcludeFromTeam.userId);
         userEntity.team = null;
-        await this.usersService.save(userEntity);
 
-        return { message: 'Player was excluded', status: HttpStatus.OK }
+        return await this.usersService.save(userEntity);
     }
 
     @Get('/:id')

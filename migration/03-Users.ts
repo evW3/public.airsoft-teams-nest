@@ -58,7 +58,7 @@ export class Users1623102765503 implements MigrationInterface {
             columnNames: ['team_id'],
             referencedColumnNames: ['id'],
             referencedTableName: 'teams',
-            onDelete: 'CASCADE'
+            onDelete: 'SET NULL'
         }));
     }
 

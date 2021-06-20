@@ -89,6 +89,7 @@ describe('Queries', () => {
             .send({queryId: queryJoinTeamEntity.id})
             .expect(HttpStatus.OK);
         expect(tmpResponse.body).not.toBeUndefined();
+        queryJoinTeamEntity = tmpResponse.body;
         done();
     });
 
@@ -105,17 +106,9 @@ describe('Queries', () => {
     afterAll(async (done) => {
         const connection = app.get(Connection);
 
-        console.log(queryJoinTeamEntity);
-        console.log(queryRoleEntity);
-        console.log(queryExitTeamEntity);
-
-        await connection
-            .getRepository(Teams)
-            .remove(teamEntity);
-
         await connection
             .getRepository(QueryParams)
-            .clear();
+            .remove(queryJoinTeamEntity.queryParams);
 
         await connection
             .getRepository(Queries)
@@ -129,13 +122,20 @@ describe('Queries', () => {
             .getRepository(Queries)
             .remove(queryExitTeamEntity);
 
+        await connection
+            .getRepository(Teams)
+            .remove(teamEntity);
+
         let userEntity = await connection
             .getRepository(Users)
             .findOne({ where: { email: mockCreateUser.email } });
 
-        await connection
-            .getRepository(Users)
-            .remove(userEntity);
+        if(userEntity) {
+            await connection
+                .getRepository(Users)
+                .remove(userEntity);
+        }
+
         done();
     });
 });

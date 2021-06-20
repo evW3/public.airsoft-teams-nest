@@ -9,8 +9,8 @@ export class IsTeamNameExistsMiddleware implements NestMiddleware {
 
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            const name = req.body.teamName;
-            const isTeamWithThisNameExists = await this.teamsService.isExistsTeam(name);
+            const teamId = req.body.teamId;
+            const isTeamWithThisNameExists = await this.teamsService.isExistsTeam(teamId);
 
             if(!isTeamWithThisNameExists) {
                 next(new HttpException('Team with this name doesn`t exists', HttpStatus.BAD_REQUEST));

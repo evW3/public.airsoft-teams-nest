@@ -11,7 +11,7 @@ export class IsUniqueNameMiddleware implements NestMiddleware {
         try {
             const name = req.body.name;
 
-            const isExistTeamWithThisName = await this.teamsService.isExistsTeam(name);
+            const isExistTeamWithThisName = await this.teamsService.isExistsTeamName(name);
             if(isExistTeamWithThisName) {
                 next(new HttpException('Team with this name already exists', HttpStatus.BAD_REQUEST));
             } else {
