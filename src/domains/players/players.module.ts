@@ -6,8 +6,8 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { TeamsModule } from '../teams/teams.module';
 import { BlockListModule } from '../blockList/blockList.module';
-import { IsUserInBlockList } from '../../middlewares/isUserInBlockList';
-import { IsUserNotBlocked } from '../../middlewares/isUserNotBlocked';
+import { IsUserInBlockListMiddleware } from '../../middlewares/isUserInBlockList.middleware';
+import { IsUserNotBlockedMiddleware } from '../../middlewares/isUserNotBlocked.middleware';
 import { SMTPService } from '../users/SMTP.service';
 
 @Module({
@@ -31,15 +31,19 @@ export class PlayersModule implements NestModule{
             .forRoutes(
                 'players/accept-join-team',
                 'players/decline-join-team',
-                'players/exclude-from-team'
+                'players/accept-exit-team',
+                'players/decline-exit-team',
+                'players/exclude-from-team',
+                'players/block',
+                'players/unblock'
             );
 
         consumer
-            .apply(IsUserInBlockList)
+            .apply(IsUserInBlockListMiddleware)
             .forRoutes('players/unblock');
 
         consumer
-            .apply(IsUserNotBlocked)
+            .apply(IsUserNotBlockedMiddleware)
             .forRoutes('players/block');
     }
 }

@@ -32,8 +32,8 @@ export class AuthService {
             userEntity.password_salt = cryptResult.salt;
             userEntity.role = roleEntity;
 
-            const userId = await this.usersService.save(userEntity);
-            const token = this.tokenService.createToken(userId);
+            const newUserEntity = await this.usersService.save(userEntity);
+            const token = this.tokenService.createToken(newUserEntity.id);
 
             return { token };
         } catch (e) {

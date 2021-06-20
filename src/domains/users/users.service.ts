@@ -1,101 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { Users } from './users.model';
-import { BcryptService } from '../auth/bcrypt.service';
-import { VerificationCodes } from './verificationCodes.model';
-import { TransportSendRecoverTokenDto } from './dto/transportSendRecoverToken.dto';
-import { SMTPService } from './SMTP.service';
-import { TokenService } from '../auth/token.service';
-import { VerificationCodesService } from './verificationCodes.service';
-import { TransportRecoverPasswordDto } from './dto/transportRecoverPassword.dto';
-import { TransportUpdateProfileDto } from './dto/transportUpdateProfile.dto';
-import path from "path";
-import { srcFolder, url } from '../../constants';
-import fs from "fs";
-import { v4 as uuid } from 'uuid';
-import { Express } from 'express';
 import { Queries } from '../queries/queries.model';
 import { BlockList } from '../blockList/blockList.model';
+import { BlockListService } from '../blockList/blockList.service';
+import { SMTPService } from './SMTP.service';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectRepository(Users) private usersRepository: Repository<Users>,
-                private readonly smtpService: SMTPService,
-                private readonly tokenService: TokenService,
-                private readonly bcryptService: BcryptService,
-                private readonly verificationCodesService: VerificationCodesService) {}
+                private readonly blockListService: BlockListService,
+                private readonly smtpService: SMTPService) {}
 
-    async sendRecoverCode(transportSendRecoverToken: TransportSendRecoverTokenDto) {
-        try {
-            const user = await this.getUserByEmail(transportSendRecoverToken.email);
-            const verificationCodeEntity = new VerificationCodes();
-            verificationCodeEntity.user = user;
-            const codeId = await this.verificationCodesService.create(verificationCodeEntity);
-            const recoverToken = this.tokenService.createRecoverToken(user.id, codeId);
-            await this.smtpService.sendMail(recoverToken, 'Recover Password', user.email);
-
-            return { message: 'Check ur email, token was sent', status: HttpStatus.OK };
-        } catch (e) {
-            if(e instanceof HttpException)
-                return e;
-            else
-                new HttpException('Server error!', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    async recoverPassword(transportRecoverPassword: TransportRecoverPasswordDto) {
-        const userEntity = await getManager().findOne(Users, transportRecoverPassword.id);
-        const cryptResult = await this.bcryptService.encrypt(transportRecoverPassword.password);
-
-        userEntity.password = cryptResult.encryptedPassword;
-        userEntity.password_salt = cryptResult.salt;
-        await this.save(userEntity);
-    }
-
-    async updateProfile(transportUpdateProfile: TransportUpdateProfileDto): Promise<void> {
-        if(transportUpdateProfile.login ||
-          (transportUpdateProfile.newPassword && transportUpdateProfile.currentPassword)) {
-
-            const userEntity = await getManager().findOne(Users, transportUpdateProfile.id);
-            if(transportUpdateProfile.newPassword && transportUpdateProfile.currentPassword) {
-
-                const userSalt = await this.getUserSalt(transportUpdateProfile.id);
-                const encryptedPassword = await this.bcryptService.encryptBySalt(transportUpdateProfile.currentPassword, userSalt);
-                const isUserValid = await this.validateUser(transportUpdateProfile.id, encryptedPassword);
-
-                if(isUserValid) {
-                    userEntity.password = await this.bcryptService.encryptBySalt(transportUpdateProfile.newPassword, userSalt);
-                }
-            }
-
-            if(transportUpdateProfile.login) {
-                userEntity.login = transportUpdateProfile.login;
-            }
-
-            await this.save(userEntity);
-        }
-    }
-
-    async loadPhoto(file: Express.Multer.File) {
-        const rootDir = path.resolve(srcFolder, '..', 'uploads');
-
-        if (!fs.existsSync(rootDir)){
-            fs.mkdirSync(rootDir);
-        }
-
-        const name = file.originalname;
-        const extension: string = name.split('.').reverse()[0];
-        const uniqueName = `${ uuid() + '.' + extension }`;
-        const fullFilePathToWrite = path.resolve(rootDir, uniqueName);
-        const fullUrl = `${ url }/${ uniqueName }`;
-        fs.writeFileSync(fullFilePathToWrite, file.buffer);
-    }
-
-    async save(user: Users): Promise<number> {
-        const userEntity = await this.usersRepository.save(user);
-        return userEntity.id;
+    async save(user: Users): Promise<Users> {
+        return await this.usersRepository.save(user);
     }
 
     async getUserByEmail(email: string): Promise<Users> {
@@ -192,5 +112,22 @@ export class UsersService {
             }
         });
         return !!user.team;
+    }
+
+    async blockUser(userEntity: Users, description: string): Promise<void> {
+        const blockEntity = new BlockList();
+
+        blockEntity.description = description;
+        blockEntity.user = userEntity;
+
+        await this.blockListService.block(blockEntity);
+
+        this.smtpService.sendMail(description, 'Blocked account', userEntity.email);
+    }
+
+    async unblockUser(userEntity: Users, description: string): Promise<void> {
+        await this.blockListService.unblock(userEntity.blockList);
+
+        this.smtpService.sendMail(description, 'Unblocked account', userEntity.email);
     }
 }

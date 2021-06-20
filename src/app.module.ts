@@ -1,9 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { JwtModule } from '@nestjs/jwt';
 
-import { ErrorModule } from './domains/errors/error.module';
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import { Users } from './domains/users/users.model';
@@ -18,7 +17,6 @@ import { Teams } from './domains/teams/teams.model';
 import { VerificationCodes } from './domains/users/verificationCodes.model';
 import { RolesModule } from './domains/roles/roles.module';
 import { TokenMiddleware } from './middlewares/token.middleware';
-import { JwtModule } from '@nestjs/jwt';
 import { QueriesModule } from './domains/queries/queries.module';
 import { TeamsModule } from './domains/teams/teams.module';
 import { BlockListModule } from './domains/blockList/blockList.module';
@@ -72,9 +70,6 @@ export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(TokenMiddleware)
-            .forRoutes('auth/test');
+            .forRoutes('auth/tests');
     }
 }
-
-//MongooseModule.forRoot(process.env.MONGO_URI),
-//ErrorModule

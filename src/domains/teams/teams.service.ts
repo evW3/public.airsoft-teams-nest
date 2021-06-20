@@ -8,8 +8,8 @@ import { Users } from '../users/users.model';
 export class TeamsService {
     constructor(@InjectRepository(Teams) private teamsRepository: Repository<Teams> ) {}
 
-    async save(team: Teams): Promise<void> {
-        await this.teamsRepository.save(team);
+    async save(team: Teams): Promise<Teams> {
+        return await this.teamsRepository.save(team);
     }
 
     async isExistsTeam(name: string): Promise<boolean> {

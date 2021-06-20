@@ -19,8 +19,7 @@ export class TeamsController {
     async createTeam(@Body() transportCreateTeamDto: TransportCreateTeamDto) {
         const teamEntity = new Teams();
         teamEntity.name = transportCreateTeamDto.name;
-        await this.teamsService.save(teamEntity);
-        return { message: 'Team created', status: HttpStatus.CREATED };
+        return await this.teamsService.save(teamEntity);
     }
 
     @Get('/:id')

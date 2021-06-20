@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { VerificationCodesService } from '../verificationCodes.service';
 
 @Injectable()
-export class IsUserHaveVerificationCode implements NestMiddleware {
+export class IsUserHaveVerificationCodeMiddleware implements NestMiddleware {
     constructor(private readonly usersService: VerificationCodesService) {}
 
     async use(req: Request, res: Response, next: NextFunction) {

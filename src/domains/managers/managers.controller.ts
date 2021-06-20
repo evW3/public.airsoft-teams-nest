@@ -1,25 +1,88 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, UseGuards, UsePipes } from '@nestjs/common';
-import { getManager } from 'typeorm';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    UseGuards, UseInterceptors,
+    UsePipes,
+} from '@nestjs/common';
 
 import { CreateRole } from '../../decorators/roles.decorator';
-import { userRoles } from '../../utils/enums';
+import { queryTypes, statuses, userRoles } from '../../utils/enums';
 import { RolesGuard } from '../../guards/role.guard';
 import { QueriesService } from '../queries/queries.service';
+import { TransportQueryDto } from './dto/transportQuery.dto';
+import { getManager } from 'typeorm';
+import { Queries } from '../queries/queries.model';
 import { RolesService } from '../roles/roles.service';
 import { Users } from '../users/users.model';
 import { UsersService } from '../users/users.service';
+import { Roles } from '../roles/roles.model';
 import { TransportManagersDto } from './dto/transportManagers.dto';
 import { BlockListService } from '../blockList/blockList.service';
-import { BlockList } from '../blockList/blockList.model';
-import { SMTPService } from '../users/SMTP.service';
+import { CommentsService } from '../queries/comments.service';
+import { Comments } from '../queries/comments.model';
+import { CreateQuery } from '../queries/decorators/query.decorator';
+import { IsQueryExistsGuard } from '../players/guards/isQueryExists.guard';
 import { SchemaValidate } from '../../pipes/schemaValidate';
 import { ManagersSchema } from './schemas/managers.schema';
+import { ExcludePassword } from '../../interceptors/response';
 
 @Controller('managers')
+@UseInterceptors(ExcludePassword)
 export class ManagersController {
-    constructor(private readonly usersService: UsersService,
+    constructor(private readonly queriesService: QueriesService,
+                private readonly rolesService: RolesService,
+                private readonly usersService: UsersService,
                 private readonly blockListService: BlockListService,
-                private readonly smtpService: SMTPService) {}
+                private readonly commentsService: CommentsService) {}
+
+    @Patch('/decline-change-role')
+    @CreateRole(userRoles.ADMIN, userRoles.MANAGER)
+    @CreateQuery(queryTypes.CHANGE_ROLE)
+    @UseGuards(RolesGuard, IsQueryExistsGuard)
+    async declineChangeRole(@Body() transportQueryDto: TransportQueryDto) {
+        const queryEntity = await getManager().findOne(Queries, transportQueryDto.queryId);
+        const commentsEntity = new Comments();
+        queryEntity.status = statuses.DECLINE;
+
+        commentsEntity.description = transportQueryDto.description;
+        commentsEntity.query = queryEntity;
+
+        await Promise.all([
+            this.queriesService.saveQuery(queryEntity),
+            this.commentsService.saveComment(commentsEntity)
+        ]);
+
+        return { message: 'Player query was declined', status: HttpStatus.OK };
+    }
+
+    @Patch('/accept-change-role')
+    @CreateRole(userRoles.ADMIN, userRoles.MANAGER)
+    @CreateQuery(queryTypes.CHANGE_ROLE)
+    @UseGuards(RolesGuard, IsQueryExistsGuard)
+    async acceptChangeRole(@Body() transportQueryDto: TransportQueryDto) {
+        const queryEntity = await getManager().findOne(Queries, transportQueryDto.queryId);
+        const roleId = await this.rolesService.getRoleIdByName(userRoles.MANAGER);
+        const rolesEntity = await getManager().findOne(Roles, roleId);
+        const userId = await this.queriesService.getUserIdByQueryId(transportQueryDto.queryId);
+        const userEntity = await getManager().findOne(Users, userId);
+
+        userEntity.role = rolesEntity;
+        queryEntity.status = statuses.ACCEPTED;
+
+        await Promise.all([
+            this.queriesService.saveQuery(queryEntity),
+            this.usersService.save(userEntity)
+        ]);
+
+        return { message: 'Player role changed successfully', status: HttpStatus.OK };
+    }
 
     @Get('/:id')
     async getPlayer(@Param('id') id: number) {
@@ -31,15 +94,20 @@ export class ManagersController {
     @UseGuards(RolesGuard)
     @UsePipes(new SchemaValidate(ManagersSchema))
     async blockPlayer(@Body() transportPlayer: TransportManagersDto) {
-        const userEntity = await getManager().findOne(Users, transportPlayer.managerId);
-        const blockEntity = new BlockList();
+        const userEntity = await getManager().findOne(Users, transportPlayer.managerId, {
+            join: {
+                alias: 'user',
+                leftJoinAndSelect: {
+                    role: 'user.role'
+                }
+            }
+        });
 
-        blockEntity.description = transportPlayer.description;
-        blockEntity.user = userEntity;
+        if(userEntity.role.name !== userRoles.MANAGER) {
+            throw new HttpException('Can`t find manager', HttpStatus.BAD_REQUEST);
+        }
 
-        await this.blockListService.block(blockEntity);
-
-        this.smtpService.sendMail(transportPlayer.description, 'Blocked account', userEntity.email);
+        await this.usersService.blockUser(userEntity, transportPlayer.description);
 
         return { message: 'Manager was blocked', status: HttpStatus.OK };
     }
@@ -53,14 +121,17 @@ export class ManagersController {
             join: {
                 alias: 'user',
                 leftJoinAndSelect: {
+                    role: 'user.role',
                     blockList: 'user.blockList'
                 }
             }
         });
 
-        await this.blockListService.unblock(userEntity.blockList);
+        if(userEntity.role.name !== userRoles.MANAGER) {
+            throw new HttpException('Can`t find manager', HttpStatus.BAD_REQUEST);
+        }
 
-        this.smtpService.sendMail(transportPlayer.description, 'Unblocked account', userEntity.email);
+        await this.usersService.unblockUser(userEntity, transportPlayer.description);
 
         return { message: 'Manager was unblocked', status: HttpStatus.OK };
     }

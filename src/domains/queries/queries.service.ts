@@ -11,8 +11,8 @@ export class QueriesService {
         return await this.queriesRepository.find();
     }
 
-    async saveQuery(query: Queries): Promise<void> {
-        await this.queriesRepository.save(query);
+    async saveQuery(query: Queries): Promise<Queries> {
+        return await this.queriesRepository.save(query);
     }
 
     async getUserIdByQueryId(queryId: number): Promise<number> {

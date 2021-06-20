@@ -11,8 +11,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 import { UsersController } from './users.controller';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
-import { IsUserHaveVerificationCode } from './middlewares/isUserHaveVerificationCode';
+import { IsUserHaveVerificationCodeMiddleware } from './middlewares/isUserHaveVerificationCode.middleware';
 import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middleware';
+import { BlockListModule } from '../blockList/blockList.module';
 
 @Module({
     imports: [
@@ -24,7 +25,8 @@ import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middlew
             secret: process.env.TOKEN_CODE_KEY,
             signOptions: { expiresIn: process.env.TOKEN_CODE_EXPIRES_IN }
         }),
-        forwardRef(() => AuthModule)
+        forwardRef(() => AuthModule),
+        BlockListModule
     ],
     controllers: [UsersController],
     providers: [UsersService, SMTPService, VerificationCodesService],
@@ -33,7 +35,7 @@ import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middlew
 export class UsersModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
-            .apply(IsUserHaveVerificationCode)
+            .apply(IsUserHaveVerificationCodeMiddleware)
             .forRoutes('users/recover-password');
         consumer
             .apply(IsExistsEmailMiddleware)

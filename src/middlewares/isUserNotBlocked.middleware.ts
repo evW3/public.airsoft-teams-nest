@@ -4,18 +4,20 @@ import { Request, Response, NextFunction } from 'express';
 import { UsersService } from '../domains/users/users.service';
 
 @Injectable()
-export class IsUserInBlockList implements NestMiddleware {
+export class IsUserNotBlockedMiddleware implements NestMiddleware {
     constructor(private readonly usersService: UsersService) {}
 
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.body.userId;
+            const userId = req.body.playerId || req.body.managerId;
             const isBannedUser = await this.usersService.isUserInBlockList(userId);
-            if(!isBannedUser) {
-                next(new HttpException('Can`t find user in ban list', HttpStatus.BAD_REQUEST));
+
+            if(isBannedUser) {
+                next(new HttpException('This user already in ban', HttpStatus.BAD_REQUEST));
             } else {
                 next();
             }
+
         } catch (e) {
             if(e instanceof HttpException)
                 next(e);

@@ -15,6 +15,7 @@ import { QueryParams } from './queryParams.model';
 import { IsUserInTeamMiddleware } from './middlewares/isUserInTeam.middleware';
 import { IsTeamNameExistsMiddleware } from '../teams/middleware/isTeamNameExists.middleware';
 import { IsUserWithoutTeamMiddleware } from './middlewares/isUserWithoutTeam.middleware';
+import { TeamsModule } from '../teams/teams.module';
 
 @Module({
     imports: [
@@ -26,7 +27,8 @@ import { IsUserWithoutTeamMiddleware } from './middlewares/isUserWithoutTeam.mid
             secret: process.env.TOKEN_SECRET_KEY,
             signOptions: { expiresIn: process.env.TOKEN_SECRET_EXPIRES_IN }
         }),
-        UsersModule
+        UsersModule,
+        TeamsModule
     ],
     controllers: [QueriesController],
     providers: [QueriesService, CommentsService, QueryParamsService],

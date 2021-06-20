@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    UseGuards, UseInterceptors,
+    UsePipes,
+} from '@nestjs/common';
 import { CreateRole } from '../../decorators/roles.decorator';
 import { queryTypes, statuses, userRoles } from '../../utils/enums';
 import { RolesGuard } from '../../guards/role.guard';
@@ -7,27 +19,23 @@ import { QueriesService } from '../queries/queries.service';
 import { getManager } from 'typeorm';
 import { Users } from '../users/users.model';
 import { UsersService } from '../users/users.service';
-import { TeamsService } from '../teams/teams.service';
 import { TransportExcludeFromTeamDto } from './dto/transportExcludeFromTeam.dto';
-import { BlockList } from '../blockList/blockList.model';
-import { BlockListService } from '../blockList/blockList.service';
 import { TransportPlayerDto } from './dto/transportPlayer.dto';
 import { CreateQuery } from '../queries/decorators/query.decorator';
 import { IsQueryExistsGuard } from './guards/isQueryExists.guard';
-import { SMTPService } from '../users/SMTP.service';
 import { SchemaValidate } from '../../pipes/schemaValidate';
 import { PlayerQuerySchema } from './schemas/playerquery.schema';
 import { ExcludeFromTeam } from './schemas/excludeFromTeam.schema';
 import { PlayerSchema } from './schemas/player.schema';
+import { Teams } from '../teams/teams.model';
+import { ExcludePassword } from '../../interceptors/response';
 
 @Controller('players')
+@UseInterceptors(ExcludePassword)
 export class PlayersController {
     constructor(
         private readonly queriesService: QueriesService,
-        private readonly usersService: UsersService,
-        private readonly teamsService: TeamsService,
-        private readonly blockListService: BlockListService,
-        private readonly smtpService: SMTPService) {}
+        private readonly usersService: UsersService) {}
 
     @Patch('/accept-join-team')
     @CreateRole(userRoles.ADMIN, userRoles.MANAGER)
@@ -36,8 +44,8 @@ export class PlayersController {
     @UsePipes(new SchemaValidate(PlayerQuerySchema))
     async acceptJoinTeam(@Body() transportPlayerQueryDto: TransportPlayerQueryDto) {
         const queryEntity = await this.queriesService.getQuery(transportPlayerQueryDto.queryId);
-        const teamName = JSON.parse(queryEntity.queryParams.parameter).teamName;
-        const teamEntity = await this.teamsService.getTeamByName(teamName);
+        const teamId = JSON.parse(queryEntity.queryParams.parameter).teamId;
+        const teamEntity = await getManager().findOne(Teams, teamId);
         const userId = await this.queriesService.getUserIdByQueryId(transportPlayerQueryDto.queryId);
         const userEntity = await getManager().findOne(Users, userId);
 
@@ -72,20 +80,24 @@ export class PlayersController {
     @UseGuards(RolesGuard, IsQueryExistsGuard)
     @UsePipes(new SchemaValidate(PlayerQuerySchema))
     async acceptExitTeam(@Body() transportPlayerQueryDto: TransportPlayerQueryDto) {
-        const queryEntity = await this.queriesService.getQuery(transportPlayerQueryDto.queryId);
-        const userId = await this.queriesService.getUserIdByQueryId(transportPlayerQueryDto.queryId);
+        try {
+            const queryEntity = await this.queriesService.getQuery(transportPlayerQueryDto.queryId);
+            const userId = await this.queriesService.getUserIdByQueryId(transportPlayerQueryDto.queryId);
 
-        const userEntity = await getManager().findOne(Users, userId);
+            const userEntity = await getManager().findOne(Users, userId);
 
-        userEntity.team = null;
-        queryEntity.status = statuses.ACCEPTED;
+            userEntity.team = null;
+            queryEntity.status = statuses.ACCEPTED;
 
-        await Promise.all([
-            this.usersService.save(userEntity),
-            this.queriesService.saveQuery(queryEntity)
-        ]);
+            await Promise.all([
+                this.usersService.save(userEntity),
+                this.queriesService.saveQuery(queryEntity)
+            ]);
 
-        return { message: 'Player exit from team', status: HttpStatus.OK };
+            return { message: 'Player exit from team', status: HttpStatus.OK };
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     @Patch('/decline-exit-team')
@@ -105,7 +117,7 @@ export class PlayersController {
 
     @Patch('/exclude-from-team')
     @CreateRole(userRoles.ADMIN, userRoles.MANAGER)
-    @UseGuards(RolesGuard)
+    @UseGuards(RolesGuard, IsQueryExistsGuard)
     @UsePipes(new SchemaValidate(ExcludeFromTeam))
     async excludeFromTeam(@Body() transportExcludeFromTeam: TransportExcludeFromTeamDto) {
         const userEntity = await getManager().findOne(Users, transportExcludeFromTeam.userId);
@@ -117,7 +129,13 @@ export class PlayersController {
 
     @Get('/:id')
     async getPlayer(@Param('id') id: number) {
-        return await this.usersService.getUser(id);
+        const userEntity = await this.usersService.getUser(id);
+
+        if(userEntity.role.name !== userRoles.PLAYER) {
+            throw new HttpException('Can`t find player', HttpStatus.BAD_REQUEST);
+        }
+
+        return userEntity;
     }
 
     @Post('/block')
@@ -125,15 +143,22 @@ export class PlayersController {
     @UseGuards(RolesGuard)
     @UsePipes(new SchemaValidate(PlayerSchema))
     async blockPlayer(@Body() transportPlayer: TransportPlayerDto) {
-        const userEntity = await getManager().findOne(Users, transportPlayer.playerId);
-        const blockEntity = new BlockList();
+        const userEntity = await getManager().findOne(Users, transportPlayer.playerId, {
+            join: {
+                alias: 'user',
+                leftJoinAndSelect: {
+                    role: 'user.role'
+                }
+            }
+        });
 
-        blockEntity.description = transportPlayer.description;
-        blockEntity.user = userEntity;
+        console.log(userEntity);
 
-        await this.blockListService.block(blockEntity);
+        if(userEntity.role.name !== userRoles.PLAYER) {
+            throw new HttpException('Can`t find manager', HttpStatus.BAD_REQUEST);
+        }
 
-        this.smtpService.sendMail(transportPlayer.description, 'Blocked account', userEntity.email);
+        await this.usersService.blockUser(userEntity, transportPlayer.description);
 
         return { message: 'Player was blocked', status: HttpStatus.OK };
     }
@@ -147,14 +172,17 @@ export class PlayersController {
             join: {
                 alias: 'user',
                 leftJoinAndSelect: {
+                    role: 'user.role',
                     blockList: 'user.blockList'
                 }
             }
         });
 
-        await this.blockListService.unblock(userEntity.blockList);
+        if(userEntity.role.name !== userRoles.PLAYER) {
+            throw new HttpException('Can`t find manager', HttpStatus.BAD_REQUEST);
+        }
 
-        this.smtpService.sendMail(transportPlayer.description, 'Unblocked account', userEntity.email);
+        await this.usersService.unblockUser(userEntity, transportPlayer.description);
 
         return { message: 'Player was unblocked', status: HttpStatus.OK };
     }

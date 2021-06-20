@@ -39,8 +39,7 @@ export class QueriesController {
         queryEntity.type = queryTypes.CHANGE_ROLE;
         queryEntity.status = statuses.PROCESSED;
 
-        await this.queriesService.saveQuery(queryEntity);
-        return { message: 'Change role query successfully created', status: HttpStatus.CREATED };
+        return await this.queriesService.saveQuery(queryEntity);
     }
 
     @Post('/join-team')
@@ -57,15 +56,12 @@ export class QueriesController {
         queryEntity.type = queryTypes.JOIN_TEAM;
         queryEntity.status = statuses.PROCESSED;
 
-        queryParamsEntity.parameter = JSON.stringify({teamName: transportCreateJoinTeamDto.teamName});
-        queryParamsEntity.query = queryEntity;
+        queryParamsEntity.parameter = JSON.stringify({teamId: transportCreateJoinTeamDto.teamId});
+        const newQueryEntity = await this.queriesService.saveQuery(queryEntity);
+        queryParamsEntity.query = newQueryEntity;
+        await this.queryParamsService.saveQueryParams(queryParamsEntity);
 
-        await Promise.all([
-            this.queriesService.saveQuery(queryEntity),
-            this.queryParamsService.saveQueryParams(queryParamsEntity)
-        ]);
-
-        return { message: 'Join team query successfully created', status: HttpStatus.CREATED };
+        return newQueryEntity;
     }
 
     @Post('/exit-team')
@@ -80,7 +76,6 @@ export class QueriesController {
         queryEntity.type = queryTypes.EXIT_FROM_TEAM;
         queryEntity.status = statuses.PROCESSED;
 
-        await this.queriesService.saveQuery(queryEntity);
-        return { message: 'Exit team query successfully created', status: HttpStatus.CREATED };
+        return await this.queriesService.saveQuery(queryEntity);
     }
 }

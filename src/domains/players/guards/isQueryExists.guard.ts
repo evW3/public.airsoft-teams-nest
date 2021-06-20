@@ -3,11 +3,12 @@ import { Reflector } from '@nestjs/core';
 import { UsersService } from '../../users/users.service';
 import { QUERY_KEY } from '../../../constants';
 import { statuses } from '../../../utils/enums';
+import { QueriesService } from '../../queries/queries.service';
 
 
 @Injectable()
 export class IsQueryExistsGuard implements CanActivate {
-    constructor(private readonly usersService: UsersService,
+    constructor(private readonly queriesService: QueriesService,
                 private readonly reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -19,16 +20,10 @@ export class IsQueryExistsGuard implements CanActivate {
 
             if(typeQuery) {
                 const req = context.switchToHttp().getRequest();
-                const userId = req.body.id;
-                const queries = await this.usersService.getUserQueries(userId);
-                if(queries) {
-                    for(let query of queries) {
-                        if(query.type === typeQuery && query.status === statuses.PROCESSED) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                const queryId = req.body.queryId;
+                const queryEntity = await this.queriesService.getQuery(queryId);
+
+                return queryEntity && queryEntity.type === typeQuery && queryEntity.status === statuses.PROCESSED;
             }
 
             return false;

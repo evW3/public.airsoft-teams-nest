@@ -6,8 +6,8 @@ import { UsersModule } from '../users/users.module';
 import { BlockListModule } from '../blockList/blockList.module';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { JwtModule } from '@nestjs/jwt';
-import { IsUserInBlockList } from '../../middlewares/isUserInBlockList';
-import { IsUserNotBlocked } from '../../middlewares/isUserNotBlocked';
+import { IsUserInBlockListMiddleware } from '../../middlewares/isUserInBlockList.middleware';
+import { IsUserNotBlockedMiddleware } from '../../middlewares/isUserNotBlocked.middleware';
 
 @Module({
     imports: [
@@ -33,11 +33,11 @@ export class ManagersModule implements NestModule {
             );
 
         consumer
-            .apply(IsUserInBlockList)
+            .apply(IsUserInBlockListMiddleware)
             .forRoutes('players/unblock');
 
         consumer
-            .apply(IsUserNotBlocked)
+            .apply(IsUserNotBlockedMiddleware)
             .forRoutes('players/block');
     }
 }

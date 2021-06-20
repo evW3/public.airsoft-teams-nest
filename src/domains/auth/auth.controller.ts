@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { UsersSchema } from './schemas/transferUsers.schema';
@@ -18,11 +18,12 @@ export class AuthController {
     }
 
     @Post('/sign-in')
+    @HttpCode(HttpStatus.OK)
     async signIn(@Body() transportUserSignInDto: TransportUserSignInDto) {
         return await this.authService.auth(transportUserSignInDto);
     }
 
-    @Post('/test')
+    @Post('/tests')
     async test(@Body() transportUserSignInDto: TransportUserSignInDto) {
         console.log(transportUserSignInDto);
     }
