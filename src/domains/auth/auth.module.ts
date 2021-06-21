@@ -2,7 +2,6 @@ import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/comm
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 
-import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { BcryptService } from './bcrypt.service';
@@ -23,7 +22,7 @@ import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middlew
         forwardRef(() => UsersModule),
         RolesModule
     ],
-    providers: [AuthService, BcryptService, TokenService],
+    providers: [BcryptService, TokenService],
     controllers: [AuthController],
     exports: [TokenService, BcryptService]
 })

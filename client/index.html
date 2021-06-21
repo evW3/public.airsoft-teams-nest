@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSockTest</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="v-app">
+        <form @submit.prevent="onSubmit">
+            <input v-model="text" type="text">
+            <button type="submit">Send</button>
+        </form>
+        <p>
+            <ul>
+                <li v-for="res in responses">{{ res }}</li>
+            </ul>
+        </p>
+    </div>
+    <script>
+        let app = new Vue({
+          el: '#v-app',
+          data: () => ({
+            text: '',
+            responses: [],
+            socket: null,
+            token: null
+          }),
+          methods: {
+            onSubmit() {
+              if(this.token) {
+                this.socket.emit('messageToServer', this.text);
+                this.text = '';
+              } else {
+                console.log('Error');
+              }
+            }
+          },
+          created() {
+            this.socket = io('http://localhost:5000', {
+              query: {
+                token: localStorage.getItem('token')
+              }
+            });
+            this.socket.on('message', msg => {
+              this.responses.push(msg);
+            });
+          }
+        })
+    </script>
+</body>
+</html>

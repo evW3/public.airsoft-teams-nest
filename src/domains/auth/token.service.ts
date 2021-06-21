@@ -12,4 +12,11 @@ export class TokenService {
     createRecoverToken(userId: number, codeId: number): string {
         return this.jwtService.sign({ id: userId, codeId });
     }
+
+    decryptToken(token: string) {
+        const params = this.jwtService.verify(token);
+        delete params.iat;
+        delete params.exp;
+        return { ...params };
+    }
 }

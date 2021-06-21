@@ -76,12 +76,9 @@ export class ManagersController {
         userEntity.role = rolesEntity;
         queryEntity.status = statuses.ACCEPTED;
 
-        await Promise.all([
-            this.queriesService.saveQuery(queryEntity),
-            this.usersService.save(userEntity)
-        ]);
+        await this.queriesService.saveQuery(queryEntity);
 
-        return { message: 'Player role changed successfully', status: HttpStatus.OK };
+        return await this.usersService.save(userEntity);
     }
 
     @Get('/:id')

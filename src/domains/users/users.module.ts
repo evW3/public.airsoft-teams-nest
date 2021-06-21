@@ -14,6 +14,7 @@ import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { IsUserHaveVerificationCodeMiddleware } from './middlewares/isUserHaveVerificationCode.middleware';
 import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middleware';
 import { BlockListModule } from '../blockList/blockList.module';
+import { EventsModule } from '../events/events.module';
 
 @Module({
     imports: [
@@ -26,7 +27,8 @@ import { BlockListModule } from '../blockList/blockList.module';
             signOptions: { expiresIn: process.env.TOKEN_CODE_EXPIRES_IN }
         }),
         forwardRef(() => AuthModule),
-        BlockListModule
+        BlockListModule,
+        EventsModule
     ],
     controllers: [UsersController],
     providers: [UsersService, SMTPService, VerificationCodesService],

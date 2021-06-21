@@ -37,6 +37,7 @@ import { Users } from './users.model';
 import { BcryptService } from '../auth/bcrypt.service';
 import { srcFolder, url } from '../../constants';
 import { ExcludePassword } from '../../interceptors/response';
+import { EventsGateway } from '../events/events.gateway';
 
 
 @Controller('users')
@@ -47,7 +48,8 @@ export class UsersController {
                 private readonly tokenService: TokenService,
                 private readonly smtpService: SMTPService,
                 private readonly bcryptService: BcryptService,
-                private readonly jwtService: JwtService) {}
+                private readonly jwtService: JwtService,
+                private readonly l: EventsGateway) {}
 
     @Post('/send-recover-code')
     @UsePipes(new SchemaValidate(SendRecoverTokenSchema))
@@ -78,6 +80,7 @@ export class UsersController {
 
     @Get('/profile')
     async getProfile(@Body() transportId: TransportIdDto) {
+        await this.l.sendToRoles('q', 'MANAGER');
         return await this.usersService.getUser(transportId.id);
     }
 
@@ -114,7 +117,7 @@ export class UsersController {
     async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() request: any) {
             const token = request.headers.authorization.split(' ').reverse()[0];
 
-            const rootDir = path.resolve(srcFolder, '..', 'uploads');
+            const rootDir = path.resolve(srcFolder, '..', '..', 'uploads');
 
             if (!fs.existsSync(rootDir)) {
                 fs.mkdirSync(rootDir);

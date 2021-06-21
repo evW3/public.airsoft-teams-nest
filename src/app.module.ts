@@ -2,6 +2,8 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { join } from "path";
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
@@ -22,6 +24,7 @@ import { TeamsModule } from './domains/teams/teams.module';
 import { BlockListModule } from './domains/blockList/blockList.module';
 import { ManagersModule } from './domains/managers/managers.module';
 import { PlayersModule } from './domains/players/players.module';
+import { EventsModule } from './domains/events/events.module';
 
 
 @Module({
@@ -63,7 +66,8 @@ import { PlayersModule } from './domains/players/players.module';
         QueriesModule,
         TeamsModule,
         ManagersModule,
-        PlayersModule
+        PlayersModule,
+        EventsModule
     ]
 })
 export class AppModule implements NestModule {
@@ -73,3 +77,6 @@ export class AppModule implements NestModule {
             .forRoutes('auth/tests');
     }
 }
+//        ServeStaticModule.forRoot({
+//             rootPath: join(__dirname, '..', '..', 'uploads')
+//         }),

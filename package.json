@@ -14,20 +14,16 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
-
     "typeorm": "node --require ./node_modules/typeorm/cli.js",
-
     "migrate-dev": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=development typeorm migration:run",
     "migrate-test": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=test typeorm migration:run",
     "migrate-dev:revert": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=development typeorm migration:revert -t='each'",
     "migrate-test:revert": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=test typeorm migration:revert -t='each'",
-
     "build:tsc": "tsc -p ."
   },
   "dependencies": {
@@ -36,7 +32,10 @@
     "@nestjs/core": "^7.6.15",
     "@nestjs/jwt": "^7.2.0",
     "@nestjs/platform-express": "^7.6.15",
+    "@nestjs/platform-socket.io": "^7.6.18",
+    "@nestjs/serve-static": "^2.1.4",
     "@nestjs/typeorm": "^7.1.5",
+    "@nestjs/websockets": "^7.6.18",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -66,6 +65,7 @@
     "@types/node": "^14.14.36",
     "@types/nodemailer": "^6.4.2",
     "@types/passport-jwt": "^3.0.5",
+    "@types/socket.io": "^3.0.2",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",

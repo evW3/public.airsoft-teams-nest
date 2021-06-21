@@ -103,6 +103,15 @@ describe('Queries', () => {
         done();
     });
 
+    it('Get queries', async (done) => {
+        const response = await request(app.getHttpServer())
+            .get('/queries/')
+            .set({ 'Authorization': `Bearer ${adminToken}` })
+            .expect(HttpStatus.OK);
+        expect(response.body).not.toBeUndefined();
+        done();
+    });
+
     afterAll(async (done) => {
         const connection = app.get(Connection);
 

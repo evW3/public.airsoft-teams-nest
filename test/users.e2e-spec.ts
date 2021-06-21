@@ -9,7 +9,7 @@ import { Connection } from 'typeorm';
 let app: INestApplication;
 
 const mockCreateUser = {
-    email: '1happyrock11@gmail.com',
+    email: 'someAnotherEmail@gmail.com',
     password: 'test',
     repeatPassword: 'test'
 }
