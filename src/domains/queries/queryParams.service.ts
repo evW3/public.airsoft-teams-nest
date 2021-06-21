@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryParams } from './queryParams.model';
 import { Repository } from 'typeorm';
+
+import { QueryParams } from './queryParams.model';
 
 @Injectable()
 export class QueryParamsService {

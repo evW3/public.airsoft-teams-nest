@@ -1,8 +1,9 @@
-import { Body, Controller, Get, HttpStatus, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { getManager } from 'typeorm';
+
 import { QueriesService } from './queries.service';
 import { TransportIdDto } from '../users/dto/transportId.dto';
 import { Queries } from './queries.model';
-import { getManager } from 'typeorm';
 import { Users } from '../users/users.model';
 import { queryTypes, statuses, userRoles } from '../../utils/enums';
 import { CreateRole } from '../../decorators/roles.decorator';

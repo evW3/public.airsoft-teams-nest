@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { queryTypes, statuses } from '../../utils/enums';
 import { Users } from '../users/users.model';
 import { Comments } from './comments.model';

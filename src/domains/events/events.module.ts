@@ -1,7 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+
 import { EventsGateway } from './events.gateway';
 import { AuthModule } from '../auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 
 @Module({

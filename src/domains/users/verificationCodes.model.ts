@@ -1,4 +1,5 @@
 import { Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Users } from './users.model';
 
 @Entity({name:'verification_codes'})

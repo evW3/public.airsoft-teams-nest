@@ -1,11 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+
 import { QueriesModule } from '../queries/queries.module';
 import { ManagersController } from './managers.controller';
 import { RolesModule } from '../roles/roles.module';
 import { UsersModule } from '../users/users.module';
 import { BlockListModule } from '../blockList/blockList.module';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
-import { JwtModule } from '@nestjs/jwt';
 import { IsUserInBlockListMiddleware } from '../../middlewares/isUserInBlockList.middleware';
 import { IsUserNotBlockedMiddleware } from '../../middlewares/isUserNotBlocked.middleware';
 

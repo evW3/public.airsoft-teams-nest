@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Teams } from './teams.model';
 import { Repository } from 'typeorm';
+
+import { Teams } from './teams.model';
 import { Users } from '../users/users.model';
 
 @Injectable()

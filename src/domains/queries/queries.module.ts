@@ -1,12 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+
 import { Queries } from './queries.model';
 import { Users } from '../users/users.model';
 import { QueriesController } from './queries.controller';
 import { QueriesService } from './queries.service';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
-import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { CommentsService } from './comments.service';
 import { Comments } from './comments.model';

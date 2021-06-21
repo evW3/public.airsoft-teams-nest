@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Users } from '../users/users.model';
 
+import { Users } from '../users/users.model';
 
 @Entity()
 export class Teams {

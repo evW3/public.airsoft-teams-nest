@@ -1,4 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
+
 import { UsersService } from '../domains/users/users.service';
 
 @Injectable()

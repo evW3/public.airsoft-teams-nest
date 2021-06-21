@@ -16,7 +16,6 @@ import { Express } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express';
 import fs from "fs";
 import { v4 as uuid } from 'uuid';
-import { JwtService } from '@nestjs/jwt';
 import { getManager } from 'typeorm';
 import path from "path";
 

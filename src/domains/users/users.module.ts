@@ -1,20 +1,19 @@
 import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 import { UsersService } from './users.service';
 import { SMTPService } from './SMTP.service';
 import { VerificationCodesService } from './verificationCodes.service';
 import { Users } from './users.model';
 import { VerificationCodes } from './verificationCodes.model';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 import { UsersController } from './users.controller';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { IsUserHaveVerificationCodeMiddleware } from './middlewares/isUserHaveVerificationCode.middleware';
 import { IsExistsEmailMiddleware } from '../../middlewares/isExistsEmail.middleware';
 import { BlockListModule } from '../blockList/blockList.module';
-import { EventsModule } from '../events/events.module';
 
 @Module({
     imports: [
@@ -33,6 +32,7 @@ import { EventsModule } from '../events/events.module';
     providers: [UsersService, SMTPService, VerificationCodesService],
     exports: [UsersService, SMTPService]
 })
+
 export class UsersModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer

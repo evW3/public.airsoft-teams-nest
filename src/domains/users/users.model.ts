@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { createUniqueName } from '../../utils/methods';
 import { defaultPhotoUrl } from '../../constants';
 import { Roles } from '../roles/roles.model';

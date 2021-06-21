@@ -1,13 +1,12 @@
 import {
     Column,
     Entity,
-    JoinColumn,
     JoinTable,
     ManyToMany,
-    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { Permissions } from './permissions.model';
 import { Users } from '../users/users.model';
 

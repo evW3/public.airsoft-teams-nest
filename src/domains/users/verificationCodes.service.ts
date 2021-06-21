@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { VerificationCodes } from './verificationCodes.model';
 
+import { VerificationCodes } from './verificationCodes.model';
 
 @Injectable()
 export class VerificationCodesService {

@@ -11,12 +11,13 @@ import {
     UseGuards, UseInterceptors,
     UsePipes,
 } from '@nestjs/common';
+import { getManager } from 'typeorm';
+
 import { CreateRole } from '../../decorators/roles.decorator';
 import { queryTypes, statuses, userRoles } from '../../utils/enums';
 import { RolesGuard } from '../../guards/role.guard';
 import { TransportPlayerQueryDto } from './dto/transportPlayerQuery.dto';
 import { QueriesService } from '../queries/queries.service';
-import { getManager } from 'typeorm';
 import { Users } from '../users/users.model';
 import { UsersService } from '../users/users.service';
 import { TransportExcludeFromTeamDto } from './dto/transportExcludeFromTeam.dto';

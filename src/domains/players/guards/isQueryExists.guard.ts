@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UsersService } from '../../users/users.service';
+
 import { QUERY_KEY } from '../../../constants';
 import { statuses } from '../../../utils/enums';
 import { QueriesService } from '../../queries/queries.service';

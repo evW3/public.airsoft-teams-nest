@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+
 import { PlayersController } from './players.controller';
 import { QueriesModule } from '../queries/queries.module';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { UsersModule } from '../users/users.module';
-import { JwtModule } from '@nestjs/jwt';
 import { TeamsModule } from '../teams/teams.module';
 import { BlockListModule } from '../blockList/blockList.module';
 import { IsUserInBlockListMiddleware } from '../../middlewares/isUserInBlockList.middleware';

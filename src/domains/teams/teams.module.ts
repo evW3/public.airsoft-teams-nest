@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+
 import { Teams } from './teams.model';
 import { TeamsController } from './teams.controller';
 import { TeamsService } from './teams.service';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { IsUniqueNameMiddleware } from './middleware/isUniqueName.middleware';
