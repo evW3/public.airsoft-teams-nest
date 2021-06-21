@@ -1,5 +1,5 @@
 import {
-    OnGatewayConnection,
+    OnGatewayConnection, OnGatewayDisconnect,
     SubscribeMessage,
     WebSocketGateway,
 } from '@nestjs/websockets';
@@ -9,7 +9,7 @@ import { UsersService } from '../users/users.service';
 
 @WebSocketGateway()
 @Injectable()
-export class EventsGateway implements OnGatewayConnection {
+export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(private readonly tokenService: TokenService,
                 private readonly usersService: UsersService) {}
 
@@ -40,4 +40,19 @@ export class EventsGateway implements OnGatewayConnection {
         }
     }
 
+    sendToUser(text: string, role: string, id: number) {
+        this.clients[role][id].emit('message', text);
+    }
+
+    handleDisconnect(client: any): any {
+        Object.values(this.clients)
+            .forEach(
+                (role: any) => {
+                    for(let [key, roleClient] of Object.entries(role)) {
+                        if(roleClient === client) {
+                            delete role[key];
+                        }
+                    }
+            });
+    }
 }

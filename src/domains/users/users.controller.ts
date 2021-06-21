@@ -37,7 +37,6 @@ import { Users } from './users.model';
 import { BcryptService } from '../auth/bcrypt.service';
 import { srcFolder, url } from '../../constants';
 import { ExcludePassword } from '../../interceptors/response';
-import { EventsGateway } from '../events/events.gateway';
 
 
 @Controller('users')
@@ -47,9 +46,7 @@ export class UsersController {
                 private readonly verificationCodesService: VerificationCodesService,
                 private readonly tokenService: TokenService,
                 private readonly smtpService: SMTPService,
-                private readonly bcryptService: BcryptService,
-                private readonly jwtService: JwtService,
-                private readonly l: EventsGateway) {}
+                private readonly bcryptService: BcryptService) {}
 
     @Post('/send-recover-code')
     @UsePipes(new SchemaValidate(SendRecoverTokenSchema))
@@ -80,7 +77,6 @@ export class UsersController {
 
     @Get('/profile')
     async getProfile(@Body() transportId: TransportIdDto) {
-        await this.l.sendToRoles('q', 'MANAGER');
         return await this.usersService.getUser(transportId.id);
     }
 
@@ -123,7 +119,7 @@ export class UsersController {
                 fs.mkdirSync(rootDir);
             }
 
-            const params = this.jwtService.verify(token);
+            const params = this.tokenService.decryptToken(token);
 
             if(params.id) {
                 delete params.iat;

@@ -27,8 +27,7 @@ import { EventsModule } from '../events/events.module';
             signOptions: { expiresIn: process.env.TOKEN_CODE_EXPIRES_IN }
         }),
         forwardRef(() => AuthModule),
-        BlockListModule,
-        EventsModule
+        BlockListModule
     ],
     controllers: [UsersController],
     providers: [UsersService, SMTPService, VerificationCodesService],
