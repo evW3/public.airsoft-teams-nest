@@ -1,0 +1,33 @@
+version: '3.0'
+
+services:
+  main:
+    container_name: main
+    image: nestapp
+    env_file:
+      - .production.env
+      - .env
+    build:
+      context: .
+    ports:
+    - 3000:3000
+    depends_on:
+      - postgres
+    command: npm run start:prod
+
+  postgres:
+    container_name: postgres
+    image: postgres:12
+    env_file:
+      - .production.env
+      - .env
+    environment:
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+
+volumes:
+  pgdata:

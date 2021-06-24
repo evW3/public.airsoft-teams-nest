@@ -14,9 +14,11 @@ export class TokenService {
     }
 
     decryptToken(token: string) {
-        const params = this.jwtService.verify(token);
-        delete params.iat;
-        delete params.exp;
-        return { ...params };
+        try {
+            const params = this.jwtService.verify(token);
+            delete params.iat;
+            delete params.exp;
+            return { ...params };
+        } catch (e) {}
     }
 }

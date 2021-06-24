@@ -36,6 +36,8 @@ import { Users } from './users.model';
 import { BcryptService } from '../auth/bcrypt.service';
 import { srcFolder, url } from '../../constants';
 import { ExcludePassword } from '../../interceptors/response';
+import { EventsModule } from '../events/events.module';
+import { EventsGateway } from '../events/events.gateway';
 
 
 @Controller('users')
@@ -45,7 +47,8 @@ export class UsersController {
                 private readonly verificationCodesService: VerificationCodesService,
                 private readonly tokenService: TokenService,
                 private readonly smtpService: SMTPService,
-                private readonly bcryptService: BcryptService) {}
+                private readonly bcryptService: BcryptService,
+                private readonly tmp: EventsGateway) {}
 
     @Post('/send-recover-code')
     @UsePipes(new SchemaValidate(SendRecoverTokenSchema))
@@ -76,6 +79,7 @@ export class UsersController {
 
     @Get('/profile')
     async getProfile(@Body() transportId: TransportIdDto) {
+        this.tmp.sendToRoles('Hi', 'PLAYER');
         return await this.usersService.getUser(transportId.id);
     }
 

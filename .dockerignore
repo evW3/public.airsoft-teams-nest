@@ -1,0 +1,9 @@
+node_modules
+uploads
+package-lock.json
+tsconfig.build.json
+tsconfig.json
+nest-cli.json
+.gitignore
+test
+src

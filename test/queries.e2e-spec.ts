@@ -137,7 +137,7 @@ describe('Queries', () => {
 
         let userEntity = await connection
             .getRepository(Users)
-            .findOne({ where: { email: mockCreateUser.email } });
+            .findOne({ where:  {email: mockCreateUser.email } });
 
         if(userEntity) {
             await connection

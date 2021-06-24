@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { getManager } from 'typeorm';
 
 import { QueriesService } from './queries.service';
@@ -15,8 +15,10 @@ import { QueryParams } from './queryParams.model';
 import { QueryParamsService } from './queryParams.service';
 import { SchemaValidate } from '../../pipes/schemaValidate';
 import { CreateJoinQuerySchema } from './schemas/createJoinQuery.schema';
+import { ExcludePasswordFromUserObject } from '../../interceptors/responseUser';
 
 @Controller('queries')
+@UseInterceptors(ExcludePasswordFromUserObject)
 export class QueriesController {
     constructor(private readonly queriesService: QueriesService,
                 private readonly queryParamsService: QueryParamsService) {}

@@ -77,6 +77,3 @@ export class AppModule implements NestModule {
             .forRoutes('auth/tests');
     }
 }
-//        ServeStaticModule.forRoot({
-//             rootPath: join(__dirname, '..', '..', 'uploads')
-//         }),
