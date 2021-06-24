@@ -36,7 +36,4 @@ export class TeamsService {
         return team.users;
     }
 
-    async getTeamByName(name: string): Promise<Teams> {
-        return await this.teamsRepository.findOne({ where: {name} });
-    }
 }

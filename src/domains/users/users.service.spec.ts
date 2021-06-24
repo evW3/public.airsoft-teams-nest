@@ -32,6 +32,9 @@ describe('[UNIT] Users', () => {
                     useValue: {
                         findOne() {
                             return ['test']
+                        },
+                        save(user: any) {
+                            return user;
                         }
                     },
                 },
@@ -48,4 +51,13 @@ describe('[UNIT] Users', () => {
         expect(await usersService.getUser(1)).toEqual(mockResult);
         done();
     });
+
+    it('should save mock user', async function(done) {
+        const tmpUser = new Users();
+        tmpUser.email = 'someEmail@gmail.com';
+        tmpUser.password = 'test';
+        expect(await usersService.save(tmpUser)).toEqual(tmpUser);
+        done();
+    });
+
 });

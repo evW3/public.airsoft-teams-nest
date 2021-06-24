@@ -97,7 +97,6 @@ export class UsersService {
                 }
             }
         });
-        console.log(user.blockList);
         return !!user.blockList;
     }
 
