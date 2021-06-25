@@ -6,4 +6,5 @@ src/uploads
 desktop.ini
 ormconfig.*
 dist*
-*.env
+.*.env
+.env
