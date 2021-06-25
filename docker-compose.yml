@@ -10,10 +10,10 @@ services:
     build:
       context: .
     ports:
-    - 3000:3000
+    - 5000:5000
     depends_on:
       - postgres
-#    command: npm run start:prod
+    command: npm run start:prod
 
   postgres:
     container_name: postgres
@@ -27,7 +27,7 @@ services:
     ports:
       - 5432:5432
     restart: always
-    command: postgres --version
+#    command: postgres --version
 
 volumes:
   pgdata:

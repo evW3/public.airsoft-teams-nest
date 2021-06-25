@@ -2,8 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { join } from "path";
-import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
@@ -25,7 +23,7 @@ import { BlockListModule } from './domains/blockList/blockList.module';
 import { ManagersModule } from './domains/managers/managers.module';
 import { PlayersModule } from './domains/players/players.module';
 import { EventsModule } from './domains/events/events.module';
-
+import * as test from '../ormconfig'
 
 @Module({
     controllers: [],
@@ -42,9 +40,9 @@ import { EventsModule } from './domains/events/events.module';
             type: 'postgres',
             host: process.env.POSTGRES_HOST,
             port: Number(process.env.POSTGRES_PORT),
-            username: process.env.POSTGRES_LOGIN,
+            username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
-            database: process.env.POSTGRES_DB_NAME,
+            database: process.env.POSTGRES_DB,
             entities: [
                 Users,
                 BlockList,

@@ -12,7 +12,7 @@
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "cross-env NODE_ENV=production node dist/src/main",
+    "start:prod": "cross-env NODE_ENV=production npm run migrate-prod && cross-env NODE_ENV=production node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
 
     "test": "jest",
@@ -24,7 +24,7 @@
 
     "typeorm": "node --require ./node_modules/typeorm/cli.js",
     "migrate-dev": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=development typeorm migration:run",
-    "migrate-prod": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=production typeorm migration:run",
+    "migrate-prod": "cd ./dist && cross-env NODE_ENV=production typeorm migration:run",
     "migrate-test": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=test typeorm migration:run",
     "migrate-dev:revert": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=development typeorm migration:revert -t='each'",
     "migrate-prod:revert": "npm run build:tsc && cd ./dist && cross-env NODE_ENV=production typeorm migration:revert -t='each'",

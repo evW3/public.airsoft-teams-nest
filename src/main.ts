@@ -13,15 +13,14 @@ async function start() {
         const PORT = process.env.PORT || 3000;
         await connect(process.env.MONGO_URI, { useUnifiedTopology: true, useNewUrlParser: true });
 
-        const connection = await createConnection({
-            type: 'postgres',
-            host: process.env.POSTGRES_HOST,
-            port: Number(process.env.POSTGRES_PORT),
-            username: process.env.POSTGRES_LOGIN,
-            password: process.env.POSTGRES_PASSWORD
-        });
-        console.log('1');
-        await connection.query(`CREATE DATABASE ${process.env.POSTGRES_DB_NAME}`);
+        // const connection = await createConnection({
+        //     type: 'postgres',
+        //     host: process.env.POSTGRES_HOST,
+        //     port: Number(process.env.POSTGRES_PORT),
+        //     username: process.env.POSTGRES_LOGIN,
+        //     password: process.env.POSTGRES_PASSWORD
+        // });
+        // await connection.query(`CREATE DATABASE ${process.env.POSTGRES_DB_NAME}`);
 
         const Errors = model("Errors", ErrorsScheme);
         const app = await NestFactory.create<NestExpressApplication>(AppModule);
